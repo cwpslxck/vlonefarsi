@@ -3,7 +3,7 @@ import { database } from "./supabase";
 export async function uploadProductImage(file: File): Promise<string | null> {
   const filePatch = `${Date.now()}`;
 
-  const { data, error } = await database.storage
+  const { error } = await database.storage
     .from("products")
     .upload(filePatch, file);
 

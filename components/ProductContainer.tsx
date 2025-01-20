@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import ProductCard from "./ProductCard";
-import { loadProducts } from "@/lib/loadProducts";
 import LoadingPart from "./LoadingPart";
 
 export default function ProductContainer() {
@@ -27,7 +26,7 @@ export default function ProductContainer() {
 
         setProducts(products);
       } catch (err: any) {
-        setError("Failed To Load Products");
+        setError(`Failed To Load Products: ${err}`);
       } finally {
         setLoading(false);
       }
@@ -44,7 +43,7 @@ export default function ProductContainer() {
         </>
       ) : (
         <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-8 gap-4">
-          {products.map((p, i) => (
+          {products.map((p) => (
             <ProductCard key={p.title} title={p.title} image={p.image} />
           ))}
         </div>

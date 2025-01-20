@@ -17,7 +17,7 @@ export default function RootLayout({
       <body className={`${font.className} container h-full px-4 mx-auto`}>
         <Header />
         {children}
-        {/* <Footer /> */}
+        <Footer />
       </body>
     </html>
   );

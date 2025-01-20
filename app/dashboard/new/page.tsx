@@ -2,11 +2,10 @@
 import { uploadProductImage } from "@/lib/uploadProductImage";
 import React, { useState } from "react";
 
+const [title, setTitle] = useState("");
+const [desc, setDesc] = useState("");
+const [image, setImage] = useState<File | null>(null);
 function addProductPage() {
-  const [title, setTitle] = useState("");
-  const [desc, setDesc] = useState("");
-  const [image, setImage] = useState<File | null>(null);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 

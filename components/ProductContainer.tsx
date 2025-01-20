@@ -3,10 +3,17 @@ import { useEffect, useState } from "react";
 import ProductCard from "./ProductCard";
 import LoadingPart from "./LoadingPart";
 
+// تعریف تایپ محصول
+interface Product {
+  id: string;
+  title: string;
+  image: string;
+}
+
 export default function ProductContainer() {
-  const [products, setProducts] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [products, setProducts] = useState<Product[]>([]); // به جای any[] از Product[] استفاده شد
+  const [loading, setLoading] = useState<boolean>(true); // مشخص کردن تایپ boolean
+  const [error, setError] = useState<string | null>(null); // مشخص کردن تایپ error
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -22,15 +29,15 @@ export default function ProductContainer() {
           throw new Error(`Failed to fetch products: ${response.statusText}`);
         }
 
-        const products = await response.json();
-
+        const products: Product[] = await response.json(); // استفاده از تایپ Product برای داده‌های API
         setProducts(products);
-      } catch (err: any) {
-        setError(`Failed To Load Products: ${err}`);
+      } catch (err) {
+        setError(`Failed To Load Products: ${(err as Error).message}`); // تایپ کردن خطا
       } finally {
         setLoading(false);
       }
     };
+
     fetchProducts();
   }, []);
 
@@ -44,7 +51,7 @@ export default function ProductContainer() {
       ) : (
         <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-8 gap-4">
           {products.map((p) => (
-            <ProductCard key={p.title} title={p.title} image={p.image} />
+            <ProductCard key={p.id} title={p.title} image={p.image} />
           ))}
         </div>
       )}

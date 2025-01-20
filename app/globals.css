@@ -5,3 +5,15 @@
 body {
   @apply bg-white text-black select-none;
 }
+
+input {
+  @apply text-black placeholder:text-black/70 outline-none py-1.5 px-2 rounded-md w-full;
+}
+
+form {
+  @apply px-3 py-4 bg-zinc-800 text-white flex flex-col justify-center items-center gap-3 w-full rounded-xl;
+}
+
+form button {
+  @apply bg-blue-500 text-white w-full py-3 rounded-md;
+}

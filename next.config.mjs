@@ -4,7 +4,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "imgflip.com",
+        hostname: "bhczdtxfnhdmepgwrmjt.supabase.co",
         port: "",
         pathname: "/**",
         search: "",

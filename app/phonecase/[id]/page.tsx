@@ -1,6 +1,4 @@
-import loadingImage from "@/assets/loading.jpg";
 import ProductCard from "@/components/ProductCard";
-import React from "react";
 
 function page() {
   return (

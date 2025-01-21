@@ -8,7 +8,7 @@ export default function Header() {
       </a>
       <a
         className="bg-black text-white px-3 py-2 rounded-lg inline-flex gap-1 justify-center items-center"
-        href="/account"
+        href="/dashboard"
       >
         <FaUserAlt />
         حساب کاربری

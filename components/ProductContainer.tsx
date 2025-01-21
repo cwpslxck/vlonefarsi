@@ -17,16 +17,14 @@ export default function ProductContainer() {
 
   useEffect(() => {
     const fetchProducts = async () => {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
       try {
-        const response = await fetch(
-          "https://vlonefarsi.vercel.app/api/products",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const response = await fetch(`${apiUrl}/api/products`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
         if (!response.ok) {
           throw new Error(`Failed to fetch products: ${response.statusText}`);
@@ -49,7 +47,6 @@ export default function ProductContainer() {
       {error || loading ? (
         <>
           <LoadingPart />
-          {error}
         </>
       ) : (
         <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-8 gap-4">

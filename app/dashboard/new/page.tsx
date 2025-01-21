@@ -29,6 +29,9 @@ export default function AddProductPage() {
 
     if (response.ok) {
       alert("Product Added Seccessfully!");
+      setTitle("");
+      setDesc("");
+      setImage(null);
     } else {
       alert("Failed To Add Product");
     }

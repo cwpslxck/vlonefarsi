@@ -11,7 +11,7 @@ input {
 }
 
 form {
-  @apply px-3 py-4 bg-zinc-800 text-white flex flex-col justify-center items-center gap-3 w-full rounded-xl;
+  @apply max-w-xs px-3 py-4 bg-zinc-800 text-white flex flex-col justify-center items-center gap-3 w-full rounded-xl;
 }
 
 form button {

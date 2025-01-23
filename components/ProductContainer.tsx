@@ -47,6 +47,7 @@ export default function ProductContainer() {
       {error || loading ? (
         <>
           <LoadingPart />
+          {console.log(error)}
         </>
       ) : (
         <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-8 gap-4">

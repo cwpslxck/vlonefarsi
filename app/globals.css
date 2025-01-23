@@ -17,3 +17,19 @@ form {
 form button {
   @apply bg-blue-500 text-white w-full py-3 rounded-md;
 }
+
+#productRouteContainer a {
+  @apply opacity-80 hover:opacity-100 duration-200;
+}
+
+hr {
+  @apply w-full lg:w-4/5;
+}
+
+.minibutton {
+  @apply text-center inline-flex items-center gap-1 text-sm font-extralight bg-zinc-200 px-3 py-1 rounded-full;
+}
+
+select {
+  @apply w-full outline-none bg-white px-2 py-3 rounded-lg mb-2;
+}

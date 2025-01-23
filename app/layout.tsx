@@ -1,9 +1,9 @@
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
-import { Vazirmatn } from "next/font/google";
+import { Rubik } from "next/font/google";
 import "./globals.css";
 
-const font = Vazirmatn({
+const font = Rubik({
   subsets: ["arabic"],
 });
 

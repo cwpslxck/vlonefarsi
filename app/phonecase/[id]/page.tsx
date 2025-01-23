@@ -5,13 +5,44 @@ import { BsInfoCircle, BsStarFill } from "react-icons/bs";
 import Toman from "@/assets/toman.svg";
 import Image from "next/image";
 import { FaAngleLeft } from "react-icons/fa";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-function Page() {
+// Define the type for the product data
+interface Product {
+  id: string;
+  title: string;
+  desc: string;
+  image: string;
+}
+
+function Page({ params }: { params: { id: string } }) {
   const [selectedOption, setSelectedOption] = useState<string>("");
   const [selectedSecondOption, setSelectedSecondOption] = useState<string>("");
   const [showSecondSelect, setShowSecondSelect] = useState<boolean>(false);
   const [showThirdSelect, setShowThirdSelect] = useState<boolean>(false);
+  const [product, setProduct] = useState<Product | null>();
+  const [loading, setLoading] = useState<boolean>(true);
+  const mojod = true;
+
+  // Fetch product data based on the ID
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await fetch(`/api/products/${params.id}`);
+        if (!response.ok) {
+          throw new Error("Product not found");
+        }
+        const data = await response.json();
+        setProduct(data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching product:", error);
+      } finally {
+      }
+    };
+
+    fetchProduct();
+  }, [params.id]);
 
   const firstOptions = [
     { value: "iphone", label: "آیفون" },
@@ -67,12 +98,21 @@ function Page() {
   };
 
   const handleSearchQuanity = () => {};
+
   return (
     <>
-      <div className="flex flex-col lg:flex-row items-center justify-between gap-2">
-        <div className="w-full lg:w-2/5 flex justify-center items-center flex-col gap-4">
-          <div className="w-1/2">
-            <ProductCard title="Hello" image={""} />
+      {!product ? <span></span> : <span></span>}
+      <div className="flex flex-col lg:flex-row items-start justify-between gap-4">
+        <div className="w-full lg:w-1/4 flex justify-center items-center flex-col gap-4">
+          <div className="w-1/2 lg:w-full pointer-events-none px-4">
+            {loading ? (
+              <ProductCard title={""} image={""} />
+            ) : (
+              <ProductCard
+                title={product?.title || ""}
+                image={product?.image || ""}
+              />
+            )}
           </div>
           <p className="minibutton">
             <BsInfoCircle />
@@ -88,16 +128,32 @@ function Page() {
             >
               <Link href={"/"}>خانه</Link>/
               <Link href={"/phonecase"}>قاب موبایل</Link>/
-              <Link href={"/phonecase/1"}>نام محصول</Link>
+              {loading ? (
+                <Link href={""} className="loadingpartanim cursor-default">
+                  sjdflsjdflsjdflj
+                </Link>
+              ) : (
+                <Link href={`/phonecase/${product?.id}`}>{product?.title}</Link>
+              )}
             </div>
-            <h1 className="text-2xl font-black">نام محصول قاب موبایل</h1>
-            <p className="font-extralight text-sm mb-2">
-              Custom Phonecase Design
-            </p>
+            {loading ? (
+              <p className="loadingpartanim text-2xl font-black">
+                jsfjlksjf fjsldjf sldj
+              </p>
+            ) : (
+              <h1 className="text-2xl font-black">{product?.title}</h1>
+            )}
+            {loading ? (
+              <p className="loadingpartanim text-sm mb-2">
+                sdf sdj hkjhksjfh kjfh
+              </p>
+            ) : (
+              <p className="font-extralight text-sm mb-2">{product?.desc}</p>
+            )}
             <hr />
             <div className="inline-flex items-center gap-2">
               <p className="inline-flex gap-1 items-center">
-                <span className="text-xl font-semibold">5</span>
+                <span className="text-xl font-semibold">{"5"}</span>
                 <BsStarFill className="text-2xl text-yellow-500" />
                 <span className="font-extralight text-sm">
                   بر اساس نظر {"12"} خریدار
@@ -109,68 +165,76 @@ function Page() {
               </a>
             </div>
             <hr />
-            <p>توضیحات</p>
           </div>
         </div>
         {/*  */}
         <div className="w-full lg:w-2/5">
-          <div className="bg-zinc-200 rounded-lg w-full p-4">
-            <div className="flex flex-col">
-              <select
-                id="first-select"
-                value={selectedOption}
-                onChange={handleFirstSelectChange}
-                className="p-2 rounded-lg"
-              >
-                <option value="">برند موبایل خود را انتخاب کنید</option>
-                {firstOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-
-              {showSecondSelect && (
+          <div className="bg-zinc-200 min-h-64 flex justify-between flex-col rounded-lg w-full p-4">
+            <div>
+              <div className="flex flex-col">
                 <select
-                  id="second-select"
-                  value={selectedSecondOption}
-                  onChange={handleSecondSelectChange}
+                  id="first-select"
+                  value={selectedOption}
+                  onChange={handleFirstSelectChange}
                   className="p-2 rounded-lg"
                 >
-                  <option value="">مدل موبایل خود را انتخاب کنید</option>
-                  {secondOptions[
-                    selectedOption as keyof typeof secondOptions
-                  ].map((option) => (
+                  <option value="">برند موبایل را انتخاب کنید</option>
+                  {firstOptions.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
                   ))}
                 </select>
-              )}
+                {showSecondSelect && (
+                  <select
+                    id="second-select"
+                    value={selectedSecondOption}
+                    onChange={handleSecondSelectChange}
+                    className="p-2 rounded-lg"
+                  >
+                    <option value="">مدل موبایل را انتخاب کنید</option>
+                    {secondOptions[
+                      selectedOption as keyof typeof secondOptions
+                    ].map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                )}
 
-              {showThirdSelect && (
-                <select
-                  onChange={handleSearchQuanity}
-                  id="third-select"
-                  className="p-2 rounded-lg"
-                >
-                  <option value="">جنس قاب موبایل را انتخاب کنید</option>
-                  {thirdOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              )}
+                {showThirdSelect && (
+                  <select
+                    onChange={handleSearchQuanity}
+                    id="third-select"
+                    className="p-2 rounded-lg"
+                  >
+                    <option value="">جنس قاب موبایل را انتخاب کنید</option>
+                    {thirdOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
             </div>
             <div className="w-full flex justify-between mt-4">
-              <button className="bg-black w-3/5 lg:w-fit text-white py-3 px-6 lg:py-2 rounded-lg text-xl">
-                افزودن به سبد
-              </button>
-              <span className="w-2/5 font-medium text-2xl inline-flex justify-end items-center gap-0.5 tracking-wide">
-                250000
-                <Image src={Toman} alt="Toman Symbol" />
-              </span>
+              {mojod ? (
+                <>
+                  <button className="bg-black w-3/5 lg:w-fit text-white py-3 px-6 lg:py-2 rounded-lg text-xl">
+                    افزودن به سبد
+                  </button>
+                  <span className="w-2/5 font-medium text-2xl inline-flex justify-end items-center gap-0.5 tracking-wide">
+                    250000
+                    <Image src={Toman} alt="Toman Symbol" />
+                  </span>
+                </>
+              ) : (
+                <span className="w-full font-medium text-2xl inline-flex justify-center items-center">
+                  ناموجود!
+                </span>
+              )}
             </div>
           </div>
         </div>

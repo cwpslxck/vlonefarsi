@@ -33,3 +33,7 @@ hr {
 select {
   @apply w-full outline-none bg-white px-2 py-3 rounded-lg mb-2;
 }
+
+.loadingpartanim {
+  @apply bg-zinc-300 w-fit text-transparent rounded-xl;
+}

@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #bebebe;
+}
+
 body {
   @apply bg-white text-black select-none;
 }
@@ -27,7 +35,7 @@ hr {
 }
 
 .minibutton {
-  @apply text-center inline-flex items-center gap-1 text-sm font-extralight bg-zinc-200 px-3 py-1 rounded-full;
+  @apply text-center inline-flex items-center gap-1 text-sm font-extralight duration-150 bg-zinc-200 hover:bg-zinc-300 px-3 py-1 rounded-full;
 }
 
 select {

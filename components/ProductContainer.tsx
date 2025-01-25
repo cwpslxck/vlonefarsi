@@ -3,17 +3,10 @@ import { useEffect, useState } from "react";
 import ProductCard from "./ProductCard";
 import LoadingPart from "./LoadingPart";
 
-// تعریف تایپ محصول
 interface Product {
   id: string;
   title: string;
   image: string;
-}
-
-// تعریف تایپ برای داده‌های ذخیره شده در localStorage
-interface CachedData {
-  timestamp: number;
-  products: Product[];
 }
 
 export default function ProductContainer() {
@@ -24,6 +17,24 @@ export default function ProductContainer() {
   useEffect(() => {
     const fetchProducts = async () => {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
+      // Check if cached data exists and is valid
+      const cachedData = localStorage.getItem("cachedProducts");
+      const cachedTimestamp = localStorage.getItem("cachedProductsTimestamp");
+
+      if (cachedData && cachedTimestamp) {
+        const currentTime = new Date().getTime();
+        const cacheDuration = 60 * 60 * 1000;
+
+        // Use cached data if it's still valid
+        if (currentTime - parseInt(cachedTimestamp) < cacheDuration) {
+          setProducts(JSON.parse(cachedData));
+          setLoading(false);
+          return;
+        }
+      }
+
+      // Fetch new data from the API
       try {
         const response = await fetch(`${apiUrl}/api/products`, {
           method: "GET",
@@ -39,12 +50,12 @@ export default function ProductContainer() {
         const products: Product[] = await response.json();
         setProducts(products);
 
-        // Save the fetched data to localStorage with a timestamp
-        const cachedData: CachedData = {
-          timestamp: Date.now(),
-          products: products,
-        };
-        localStorage.setItem("cachedProducts", JSON.stringify(cachedData));
+        // Cache the new data and timestamp
+        localStorage.setItem("cachedProducts", JSON.stringify(products));
+        localStorage.setItem(
+          "cachedProductsTimestamp",
+          new Date().getTime().toString()
+        );
       } catch (err) {
         setError(`Failed To Load Products: ${(err as Error).message}`);
       } finally {
@@ -52,24 +63,13 @@ export default function ProductContainer() {
       }
     };
 
-    const cachedProducts = localStorage.getItem("cachedProducts");
-
-    if (cachedProducts) {
-      const parsedCachedData: CachedData = JSON.parse(cachedProducts);
-      const now = Date.now();
-      const oneHour = 60 * 60 * 1000; // 1 hour in milliseconds
-
-      // Check if the cached data is older than 1 hour
-      if (now - parsedCachedData.timestamp < oneHour) {
-        // Use the cached data if it's still fresh
-        setProducts(parsedCachedData.products);
-        setLoading(false);
-        return;
-      }
-    }
-
-    // Fetch new data if there's no cached data or it's outdated
     fetchProducts();
+
+    // Optionally, set up an interval to refresh data periodically
+    const interval = setInterval(fetchProducts, 60 * 60 * 1000); // Refresh every 15 minutes
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(interval);
   }, []);
 
   return (

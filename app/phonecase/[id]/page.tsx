@@ -118,9 +118,13 @@ function Page({ params }: { params: { id: string } }) {
             <BsInfoCircle />
             این تصویر صرفا جهت نمایش طرح قاب موبایل است.
           </p>
+          <p className="minibutton -mt-2">
+            قابی که به شما تحویل داده میشه، دقیقا مناسب همون مدل گوشی ای هست که
+            موقع خرید انتخاب میکنید.
+          </p>
         </div>
         {/*  */}
-        <div className="w-full lg:w-2/5 flex flex-col justify-start md:justify-center items-start gap-3">
+        <div className="w-full pt-12 lg:w-2/5 flex flex-col justify-start md:justify-center items-start gap-3">
           <div className="flex flex-col justify-start gap-2 w-full">
             <div
               id="productRouteContainer"
@@ -169,7 +173,7 @@ function Page({ params }: { params: { id: string } }) {
         </div>
         {/*  */}
         <div className="w-full lg:w-2/5">
-          <div className="bg-zinc-200 min-h-64 flex justify-between flex-col rounded-lg w-full p-4">
+          <div className="bg-zinc-200 flex justify-between flex-col rounded-lg w-full p-4">
             <div>
               <div className="flex flex-col">
                 <select

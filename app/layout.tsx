@@ -22,7 +22,7 @@ export default function RootLayout({
     <html dir="rtl" lang="fa">
       <body className={`${font.className} antialiased`}>
         <Header />
-        <main className="mx-auto container">{children}</main>
+        <main className="mx-auto container pb-4">{children}</main>
         <Footer />
       </body>
     </html>

@@ -9,8 +9,8 @@ function Header() {
       new: true,
     },
     {
-      title: "قاب‌های آماده",
-      href: "/available",
+      title: "قاب‌ها",
+      href: "/phonecase",
       new: false,
     },
     {
@@ -20,8 +20,8 @@ function Header() {
     },
   ];
   return (
-    <div className="flex z-50 overflow-hidden sticky top-0 w-full bg-background/70 backdrop-blur-lg">
-      <div className="flex items-center h-14 w-full justify-between px-4">
+    <div className="flex z-50 overflow-hidden sticky top-0 w-full bg-background/70 backdrop-blur-xl">
+      <div className="flex mx-auto container items-center h-14 w-full justify-between px-4">
         <div className="inline-flex gap-6 items-center">
           {/* <div>
             <MenuIcon />
@@ -41,11 +41,11 @@ function Header() {
                 </Link>
               </li>
             ))}
-            <Link className="hidden md:block" href={"/make-money"}>
-              <div className="px-2.5 bg-background hover:bg-foreground hover:text-background transition-all hover:scale-110 py-1.5 font-medium text-sm rounded-full border">
+            {/* <Link className="hidden md:block" href={"/make-money"}>
+              <div className="px-2.5 hover:bg-foreground hover:text-background transition-all hover:scale-110 py-1.5 font-medium text-sm rounded-full border">
                 کسب درامد
               </div>
-            </Link>
+            </Link> */}
           </ul>
         </div>
         <div className="inline-flex items-center text-xl gap-3">

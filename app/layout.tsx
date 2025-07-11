@@ -3,6 +3,7 @@ import { Rubik } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
+import { ThemeProvider } from "@/components/providers/theme-provider";
 
 const font = Rubik({
   subsets: ["arabic"],
@@ -19,10 +20,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html dir="rtl" lang="fa">
+    <html dir="rtl" lang="fa" suppressHydrationWarning>
       <body className={`${font.className} antialiased`}>
         <Header />
-        <main className="mx-auto container pb-4">{children}</main>
+        <ThemeProvider
+          attribute={"class"}
+          defaultTheme="dark"
+          disableTransitionOnChange
+        >
+          <main className="mx-auto container p-4">{children}</main>
+        </ThemeProvider>
         <Footer />
       </body>
     </html>

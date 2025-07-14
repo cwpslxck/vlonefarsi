@@ -2,16 +2,24 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
-function Card() {
+function Card({
+  href,
+  image_url,
+  name,
+}: {
+  href: string;
+  image_url: string;
+  name: string;
+}) {
   return (
     <div className="aspect-[9/18] w-full border border-stone-700 hover:-translate-y-1 duration-300 bg-stone-900 rounded-3xl overflow-hidden relative cursor-pointer">
-      <Link className="h-full w-full" href={"/phonecase/123"}>
+      <Link className="h-full w-full" href={href || ""}>
         <div className="absolute w-full h-full top-0 right-0 left-0">
           <Image
             width={500}
             height={500}
-            src="/images/card-default.jpg"
-            alt="Image"
+            src={image_url || "/images/card-default.jpg"}
+            alt={`${name} Phonecase` || "Phonecase"}
             loading="lazy"
             className="h-full w-full object-cover"
           />

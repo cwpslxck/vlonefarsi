@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import ReactQueryProvider from "@/components/providers/query-client-provider";
 
 const font = Rubik({
   subsets: ["arabic"],
@@ -28,7 +29,9 @@ export default function RootLayout({
           defaultTheme="dark"
           disableTransitionOnChange
         >
-          <main className="mx-auto container p-4">{children}</main>
+          <ReactQueryProvider>
+            <main className="mx-auto container p-4">{children}</main>
+          </ReactQueryProvider>
         </ThemeProvider>
         <Footer />
       </body>

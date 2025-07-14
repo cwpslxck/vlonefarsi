@@ -18,10 +18,6 @@ function Page() {
               <div className="w-1/2 md:w-2/3">
                 <Card />
               </div>
-              {/* <div className="bg-white/10 px-3 py-1 rounded-full flex items-center text-sm gap-1">
-                <BiInfoCircle />
-                این تصویر فقط پیشنمایشی از محصولیه که به دستتون میرسه
-              </div> */}
             </div>
           </div>
 
@@ -40,8 +36,8 @@ function Page() {
             </div>
             {/* Price */}
             <div className="flex justify-start items-end gap-2">
-              <span className="text-2xl font-semibold text-white">
-                {"260"}تومان
+              <span className="text-2xl font-medium text-white">
+                {"260"}هزارتومان
               </span>
               <div className="flex-col hidden">
                 <span className="text-lg text-gray-500 line-through">
@@ -56,7 +52,7 @@ function Page() {
             <div className="flex flex-col gap-4">
               {/* Action Buttons */}
               <div className="space-y-4 ">
-                <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Select>
                     <SelectTrigger size="shoping-page" className="w-full h-14">
                       <SelectValue placeholder="برند موبایل" />

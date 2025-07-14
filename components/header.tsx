@@ -18,12 +18,12 @@ function Header() {
   ];
   return (
     <>
-      <div className="pointer-events-none p-2 break-all text-xs sm:text-lg select-none w-full bg-gradient-to-r from-stone-100 via-violet-100 to-stone-50 h-12 text-black font-bold flex justify-center items-center gap-1">
+      {/* <div className="pointer-events-none p-2 break-all text-xs sm:text-lg select-none w-full bg-foreground h-12 text-background font-bold flex justify-center items-center gap-1">
         کد تخفیف 30% به مناسبت افتتاح وبسایت
         <span className="bg-red-600 font-medium text-xs sm:text-[1rem] text-white px-2 py-1 rounded">
           I-LOVE-VF
         </span>
-      </div>
+      </div> */}
       <div className="flex z-50 overflow-hidden flex-col sticky top-0 w-full bg-background/70 backdrop-blur-xl">
         <div className="flex mx-auto container items-center h-14 w-full justify-between px-4">
           <div className="inline-flex gap-6 items-center">

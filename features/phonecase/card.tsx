@@ -12,12 +12,12 @@ function Card({
   name: string;
 }) {
   return (
-    <div className="aspect-[9/18] w-full border border-stone-700 hover:-translate-y-1 duration-300 bg-stone-900 rounded-3xl overflow-hidden relative cursor-pointer">
+    <div className="aspect-[9/18] w-full border border-stone-700 hover:-translate-y-[1px] duration-300 bg-stone-900 rounded-3xl overflow-hidden relative cursor-pointer">
       <Link className="h-full w-full" href={href || ""}>
         <div className="absolute w-full h-full top-0 right-0 left-0">
           <Image
-            width={500}
-            height={500}
+            width={150}
+            height={150}
             src={image_url || "/images/card-default.jpg"}
             alt={`${name} Phonecase` || "Phonecase"}
             loading="lazy"

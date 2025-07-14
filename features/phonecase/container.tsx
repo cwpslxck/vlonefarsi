@@ -18,11 +18,10 @@ const createSlug = (text: string) => {
     .replace(/-+$/, "");
 };
 
-const INITIAL_PAGE_SIZE = 12;
+const INITIAL_PAGE_SIZE = 6;
 const SUBSEQUENT_PAGE_SIZE = 6;
 
 const fetchDesigns = async ({ pageParam = 0 }) => {
-  // تعیین اندازه صفحه بر اساس اینکه اولین درخواست است یا خیر
   const pageSize = pageParam === 0 ? INITIAL_PAGE_SIZE : SUBSEQUENT_PAGE_SIZE;
 
   const { data, error } = await supabase
@@ -58,7 +57,7 @@ export default function Container() {
     queryFn: fetchDesigns,
     getNextPageParam: (lastPage) => lastPage.nextPage,
     initialPageParam: 0,
-    staleTime: 1000 * 60 * 10, // 10 minutes cache
+    staleTime: 1000 * 60 * 10,
   });
 
   useEffect(() => {

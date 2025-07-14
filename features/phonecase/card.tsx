@@ -7,9 +7,9 @@ function Card({
   image_url,
   name,
 }: {
-  href: string;
-  image_url: string;
-  name: string;
+  href?: string;
+  image_url?: string;
+  name?: string;
 }) {
   return (
     <div className="aspect-[9/18] w-full border border-stone-700 hover:-translate-y-[1px] duration-300 bg-stone-900 rounded-3xl overflow-hidden relative cursor-pointer">

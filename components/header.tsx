@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { BsInstagram } from "react-icons/bs";
 import { FaUserAlt } from "react-icons/fa";

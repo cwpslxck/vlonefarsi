@@ -30,7 +30,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <ReactQueryProvider>
-            <main className="mx-auto container p-4">{children}</main>
+            <main className="mx-auto container max-w-3xl p-4">{children}</main>
           </ReactQueryProvider>
         </ThemeProvider>
         <Footer />

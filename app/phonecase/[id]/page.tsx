@@ -85,7 +85,7 @@ function Page() {
           {/* Product Image Section */}
           <div className="w-full md:w-1/2">
             <div className="pointer-events-none flex items-center justify-center p-8">
-              <div className="w-1/2 md:w-2/3">
+              <div className="w-1/2 md:w-full">
                 <Card image_url={design.image_url} />
               </div>
             </div>

@@ -1,33 +1,38 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import Card from "./card";
 import { supabase } from "@/lib/supbabase/client";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
-import { useEffect } from "react";
 import ContainerSkeleton from "./container-skeleton";
 import CardSkeleton from "./card-skeleton";
+import Link from "next/link";
+import { ArrowDown } from "lucide-react";
+
+type ContainerProps = {
+  limit?: number;
+};
 
 const createSlug = (text: string) => {
   return text
-    .trim() // حذف فاصله‌های اضافی از ابتدا و انتها
-    .replace(/\s+/g, "-") // تبدیل فاصله‌ها به خط فاصله
-    .replace(/\-\-+/g, "-") // تبدیل چندین خط فاصله پشت سر هم به یک خط فاصله
-    .replace(/^-+/, "") // حذف خط فاصله از ابتدا
-    .replace(/-+$/, ""); // حذف خط فاصله از انتها
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/\-\-+/g, "-")
+    .replace(/^-+/, "")
+    .replace(/-+$/, "");
 };
 
 const INITIAL_PAGE_SIZE = 6;
-const SUBSEQUENT_PAGE_SIZE = 6;
+const SUBSEQUENT_PAGE_SIZE = 4;
 
-const fetchDesigns = async ({ pageParam = 0 }) => {
+const fetchDesignsPaginated = async ({ pageParam = 0 }) => {
   const pageSize = pageParam === 0 ? INITIAL_PAGE_SIZE : SUBSEQUENT_PAGE_SIZE;
 
   const { data, error } = await supabase
     .from("designs")
     .select("*")
     .range(pageParam, pageParam + pageSize - 1)
-    .order("created_at", { ascending: false });
+    .order("design", { ascending: false });
 
   if (error) throw error;
 
@@ -37,59 +42,110 @@ const fetchDesigns = async ({ pageParam = 0 }) => {
   };
 };
 
-export default function Container() {
+const fetchDesignsLimited = async (limit: number) => {
+  const { data, error } = await supabase
+    .from("designs")
+    .select("*")
+    .limit(limit)
+    .order("design", { ascending: false });
+
+  if (error) throw error;
+  return data;
+};
+
+export default function Container({ limit }: ContainerProps) {
   const { ref, inView } = useInView({
     threshold: 0,
     triggerOnce: false,
     rootMargin: "300px",
   });
 
+  // حالت limit مشخص شده
   const {
-    data,
-    error,
+    data: limitedData,
+    isLoading: isLimitedLoading,
+    error: limitedError,
+  } = useQuery({
+    queryKey: ["products", "phonecases", limit],
+    queryFn: () => fetchDesignsLimited(limit!),
+    enabled: !!limit,
+    staleTime: 1000 * 60 * 10,
+  });
+
+  // حالت infinite
+  const {
+    data: infiniteData,
+    error: infiniteError,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
     status,
   } = useInfiniteQuery({
     queryKey: ["products", "phonecases"],
-    queryFn: fetchDesigns,
+    queryFn: fetchDesignsPaginated,
     getNextPageParam: (lastPage) => lastPage.nextPage,
     initialPageParam: 0,
+    enabled: !limit,
     staleTime: 1000 * 60 * 10,
   });
 
   useEffect(() => {
-    if (inView && hasNextPage && !isFetchingNextPage) {
+    if (inView && hasNextPage && !isFetchingNextPage && !limit) {
       fetchNextPage();
     }
-  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage, inView, limit]);
 
-  if (status === "pending") {
+  if (limit) {
+    if (isLimitedLoading || !limitedData || limitedData.length === 0)
+      return <ContainerSkeleton />;
+
+    return (
+      <div>
+        <div className="flex justify-between items-center mb-2">
+          <p className="text-xl text-center font-semibold">جدیدترین قاب‌ها</p>
+          <Link
+            href={"/phonecase"}
+            className="flex justify-center py-2 font-light text-sm items-center gap-1"
+          >
+            مشاهده همه
+            <ArrowDown className="rotate-225 size-5" />
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {limitedData.map((design) => (
+            <Card
+              key={design.id}
+              href={`/phonecase/${design.id}`}
+              image_url={design.image_url}
+              name={design.name}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (
+    status === "pending" ||
+    !infiniteData?.pages[0]?.data ||
+    infiniteData.pages[0].data.length === 0
+  )
     return <ContainerSkeleton />;
-  }
-
-  if (!data?.pages[0]?.data || data.pages[0].data.length === 0) {
-    return <div>Miaw net nadari :9</div>;
-  }
 
   return (
     <>
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 justify-between md:px-4 gap-4 md:gap-8 flex-wrap">
-        {data.pages.map((page, i) => (
-          <React.Fragment key={i}>
-            {page.data.map((design) => (
-              <Card
-                href={`/phonecase/${design.id}`}
-                image_url={design.image_url}
-                name={design.name}
-                key={design.id}
-              />
-            ))}
-          </React.Fragment>
-        ))}
-
-        {isFetchingNextPage ? (
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        {infiniteData.pages.map((page, i) =>
+          page.data.map((design) => (
+            <Card
+              key={design.id}
+              href={`/phonecase/${design.id}`}
+              image_url={design.image_url}
+              name={design.name}
+            />
+          ))
+        )}
+        {isFetchingNextPage && (
           <>
             <CardSkeleton />
             <CardSkeleton />
@@ -98,11 +154,10 @@ export default function Container() {
             <CardSkeleton />
             <CardSkeleton />
           </>
-        ) : (
-          <span></span>
         )}
       </div>
-      <div ref={ref} className="h-1 w-full"></div>
+
+      <div ref={ref} />
     </>
   );
 }

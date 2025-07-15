@@ -1,20 +1,44 @@
+"use client";
 import Link from "next/link";
 import { BsInstagram } from "react-icons/bs";
 import { FaUserAlt } from "react-icons/fa";
+import { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
 
 function Header() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   const items = [
     {
       title: "قاب‌ها",
       href: "/phonecase",
-      new: false,
     },
     {
       title: "طرح دلخواه",
       href: "/phonecase/custom",
-      new: false,
     },
   ];
+
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isMenuOpen]);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+  };
+
   return (
     <>
       {/* <div className="pointer-events-none p-2 break-all text-xs sm:text-lg select-none w-full bg-foreground h-12 text-background font-bold flex justify-center items-center gap-1">
@@ -23,12 +47,37 @@ function Header() {
           I-LOVE-VF
         </span>
       </div> */}
-      <div className="flex z-50 overflow-hidden flex-col sticky top-0 w-full bg-background/70 backdrop-blur-xl">
+      <div
+        className={cn(
+          `flex z-50 overflow-hidden flex-col sticky top-0 w-full`,
+          isMenuOpen ? "bg-transparent" : "bg-background/70 backdrop-blur-xl"
+        )}
+      >
         <div className="flex mx-auto container items-center h-14 w-full justify-between px-4">
-          <div className="inline-flex gap-6 items-center">
-            {/* <div>
-            <MenuIcon />
-          </div> */}
+          <div className="inline-flex gap-2 md:gap-6 items-center">
+            {/* Hamburger Menu Button */}
+            <button
+              onClick={toggleMenu}
+              className="md:hidden flex flex-col gap-1 p-2 hoveranim cursor-pointer"
+              aria-label="Menu"
+            >
+              <span
+                className={`w-5 h-0.5 bg-foreground transition-all duration-300 ${
+                  isMenuOpen ? "rotate-45 translate-y-1.5" : ""
+                }`}
+              ></span>
+              <span
+                className={`w-5 h-0.5 bg-foreground transition-all duration-300 ${
+                  isMenuOpen ? "opacity-0" : ""
+                }`}
+              ></span>
+              <span
+                className={`w-5 h-0.5 bg-foreground transition-all duration-300 ${
+                  isMenuOpen ? "-rotate-45 -translate-y-1.5" : ""
+                }`}
+              ></span>
+            </button>
+
             <Link
               href={"/"}
               className="text-xl font-black tracking-widest hoveranim"
@@ -43,7 +92,6 @@ function Header() {
                 >
                   <Link className="flex hoveranim" href={item.href}>
                     {item.title}
-                    {item.new ? <p className="animate-bounce">‼️</p> : null}
                   </Link>
                 </li>
               ))}
@@ -69,6 +117,34 @@ function Header() {
           </div>
         </div>
       </div>
+
+      {isMenuOpen && (
+        <div className="fixed inset-0 z-40 md:hidden">
+          <div
+            className="absolute inset-0 bg-background/70 backdrop-blur-xl"
+            onClick={closeMenu}
+          ></div>
+
+          <div
+            className={`absolute top-0 left-0 w-full transition-transform duration-200 ${
+              isMenuOpen ? "translate-y-0" : "-translate-y-full"
+            }`}
+          >
+            <div className="flex flex-col px-6 pt-20 gap-2">
+              {items.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="flex items-center gap-2 text-white text-lg font-medium py-2 hoveranim"
+                  onClick={closeMenu}
+                >
+                  {item.title}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

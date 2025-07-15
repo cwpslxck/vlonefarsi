@@ -1,5 +1,7 @@
 function CardSkeleton() {
-  return <div className="w-full aspect-9/18 rounded-3xl bg-stone-900"></div>;
+  return (
+    <div className="aspect-[9/18] w-full bg-stone-900 rounded-2xl md:rounded-3xl"></div>
+  );
 }
 
 export default CardSkeleton;

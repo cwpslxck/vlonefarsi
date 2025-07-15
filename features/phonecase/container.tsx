@@ -10,12 +10,11 @@ import CardSkeleton from "./card-skeleton";
 
 const createSlug = (text: string) => {
   return text
-    .toLowerCase()
-    .replace(/\s+/g, "-")
-    .replace(/[^\w\-]+/g, "")
-    .replace(/\-\-+/g, "-")
-    .replace(/^-+/, "")
-    .replace(/-+$/, "");
+    .trim() // حذف فاصله‌های اضافی از ابتدا و انتها
+    .replace(/\s+/g, "-") // تبدیل فاصله‌ها به خط فاصله
+    .replace(/\-\-+/g, "-") // تبدیل چندین خط فاصله پشت سر هم به یک خط فاصله
+    .replace(/^-+/, "") // حذف خط فاصله از ابتدا
+    .replace(/-+$/, ""); // حذف خط فاصله از انتها
 };
 
 const INITIAL_PAGE_SIZE = 6;
@@ -76,12 +75,12 @@ export default function Container() {
 
   return (
     <>
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 justify-between px-4 gap-8 flex-wrap">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 justify-between md:px-4 gap-4 md:gap-8 flex-wrap">
         {data.pages.map((page, i) => (
           <React.Fragment key={i}>
             {page.data.map((design) => (
               <Card
-                href={`/phonecase/${createSlug(design.name)}`}
+                href={`/phonecase/${design.id}`}
                 image_url={design.image_url}
                 name={design.name}
                 key={design.id}

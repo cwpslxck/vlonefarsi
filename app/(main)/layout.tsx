@@ -1,22 +1,9 @@
-import type { Metadata } from "next";
-import Header from "@/components/header";
-import Footer from "@/components/footer";
+import MainLayout from "@/components/main-layout";
 
-export const metadata: Metadata = {
-  title: "VLONEFARSI",
-  description: "CUSTOM PHONECASE ONLINESHOP",
-};
-
-export default function RootLayout({
+export default function Layout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <>
-      <Header />
-      <main className="mx-auto container max-w-4xl p-4">{children}</main>
-      <Footer />
-    </>
-  );
+  return <MainLayout>{children}</MainLayout>;
 }

@@ -4,7 +4,7 @@ export const metadata: Metadata = {
   title: "VLONEFARSI - LOGIN",
 };
 
-export default function RootLayout({
+export default function Layout({
   children,
 }: Readonly<{
   children: React.ReactNode;

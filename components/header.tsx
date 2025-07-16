@@ -82,7 +82,7 @@ function Header() {
               href={"/"}
               className="text-xl font-black tracking-widest hoveranim"
             >
-              ولون فارسی
+              ویلون فارسی
             </Link>
             <ul className="hidden md:inline-flex gap-4">
               {items.map((item) => (

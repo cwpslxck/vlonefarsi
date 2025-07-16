@@ -8,7 +8,7 @@ import { FaDiscord, FaGoogle } from "react-icons/fa";
 import Link from "next/link";
 import Logo from "./logo";
 
-export function LoginForm({
+export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
@@ -23,11 +23,11 @@ export function LoginForm({
             >
               <Logo />
             </Link>
-            <h1 className="text-xl font-bold">ورود به ویلون فارسی</h1>
+            <h1 className="text-xl font-bold">ثبت‌نام در ویلون فارسی</h1>
             <div className="text-center text-sm">
-              اکانت نداری؟{" "}
-              <Link href="/signup" className="underline underline-offset-4">
-                ثبت‌نام کن
+              از قبل اکانت داری؟{" "}
+              <Link href="/login" className="underline underline-offset-4">
+                لاگین کن
               </Link>
             </div>
           </div>
@@ -53,7 +53,7 @@ export function LoginForm({
               />
             </div>
             <Button type="submit" className="w-full">
-              ورود
+              ثبت‌نام در ویلون فارسی
             </Button>
           </div>
           <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">

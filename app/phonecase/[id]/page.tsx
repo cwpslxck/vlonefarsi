@@ -1,15 +1,9 @@
 "use client";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import Card from "@/features/phonecase/card";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supbabase/client";
+import ActionButtons from "@/features/phonecase/action-buttons";
 
 interface Design {
   id: string;
@@ -111,61 +105,34 @@ function Page() {
             </div>
 
             <div className="flex flex-col gap-4">
-              {/* Action Buttons */}
-              <div className="space-y-4 ">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Select>
-                    <SelectTrigger size="shoping-page" className="w-full h-14">
-                      <SelectValue placeholder="برند موبایل" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="iphone">iPhone - آیفون</SelectItem>
-                      <SelectItem value="samsung">Samsung - سامسونگ</SelectItem>
-                      <SelectItem value="xiaomi">Xiaomi - شیاومی</SelectItem>
-                      <SelectItem value="huawei">Huawei - هواوی</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select>
-                    <SelectTrigger size="shoping-page" className="w-full h-14">
-                      <SelectValue placeholder="مدل موبایل" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="test">Test</SelectItem>
-                    </SelectContent>
-                  </Select>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex items-center space-x-3 p-4 bg-stone-900 rounded-lg">
+                  <div className="bg-lime-600 p-2 rounded-lg">
+                    <div className="h-5 w-5 bg-white/20 rounded"></div>
+                  </div>
+                  <div>
+                    <p className="font-medium text-white">بالاترین کیفیت</p>
+                    <p className="text-sm text-gray-400">
+                      قابها ابعاد استاندارد گوشی رو دارن و از گوشیتون محافظت
+                      میکنن
+                    </p>
+                  </div>
                 </div>
 
-                <button className="w-full bg-white text-black font-medium py-4 px-6 rounded-lg hover:bg-gray-100 transition-colors">
-                  افزودن به سبد خرید
-                </button>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="flex items-center space-x-3 p-4 bg-stone-900 rounded-lg">
-                    <div className="bg-lime-600 p-2 rounded-lg">
-                      <div className="h-5 w-5 bg-white/20 rounded"></div>
-                    </div>
-                    <div>
-                      <p className="font-medium text-white">بالاترین کیفیت</p>
-                      <p className="text-sm text-gray-400">
-                        قابها ابعاد استاندارد گوشی رو دارن و از گوشیتون محافظت
-                        میکنن
-                      </p>
-                    </div>
+                <div className="flex items-center space-x-3 p-4 bg-stone-900 rounded-lg">
+                  <div className="bg-lime-600 p-2 rounded-lg">
+                    <div className="h-5 w-5 bg-white/20 rounded"></div>
                   </div>
-
-                  <div className="flex items-center space-x-3 p-4 bg-stone-900 rounded-lg">
-                    <div className="bg-lime-600 p-2 rounded-lg">
-                      <div className="h-5 w-5 bg-white/20 rounded"></div>
-                    </div>
-                    <div>
-                      <p className="font-medium text-white">همیشه موجود</p>
-                      <p className="text-sm text-gray-400">
-                        آماده سازی بعد از سفارش شما انجام میشه پس همیشه موجوده!
-                      </p>
-                    </div>
+                  <div>
+                    <p className="font-medium text-white">همیشه موجود</p>
+                    <p className="text-sm text-gray-400">
+                      آماده سازی بعد از سفارش شما انجام میشه پس همیشه موجوده!
+                    </p>
                   </div>
                 </div>
               </div>
+              {/* Action Buttons */}
+              <ActionButtons />
             </div>
           </div>
         </div>

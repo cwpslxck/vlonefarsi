@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Select,
   SelectContent,
@@ -20,12 +22,21 @@ function ActionButtons() {
   const [models, setModels] = useState<PhoneModel[]>([]);
   const [loadingModels, setLoadingModels] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
   const [brands] = useState([
     { id: "iphone", name: "iPhone - آیفون" },
     { id: "samsung", name: "Samsung - سامسونگ" },
     { id: "xiaomi", name: "Xiaomi - شیاومی" },
     { id: "huawei", name: "Huawei - هواوی" },
   ]);
+
+  useEffect(() => {
+    const storedBrand = localStorage.getItem("user_phone_brand");
+    const storedModel = localStorage.getItem("user_phone_model");
+
+    if (storedBrand) setSelectedBrand(storedBrand);
+    if (storedModel) setSelectedModel(storedModel);
+  }, []);
 
   useEffect(() => {
     const fetchModels = async () => {
@@ -53,6 +64,10 @@ function ActionButtons() {
         } else {
           setModels(data);
           setError(null);
+          const storedModel = localStorage.getItem("user_phone_model");
+          if (storedModel && data.some((m) => m.id === storedModel)) {
+            setSelectedModel(storedModel);
+          }
         }
       } catch (error) {
         console.error("Error fetching models:", error);
@@ -66,12 +81,23 @@ function ActionButtons() {
     fetchModels();
   }, [selectedBrand]);
 
+  const handleBrandChange = (brand: string) => {
+    setSelectedBrand(brand);
+    localStorage.setItem("user_phone_brand", brand);
+    localStorage.removeItem("user_phone_model");
+    setSelectedModel(null);
+  };
+
+  const handleModelChange = (model: string) => {
+    setSelectedModel(model);
+    localStorage.setItem("user_phone_model", model);
+  };
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Select
           value={selectedBrand || undefined}
-          onValueChange={setSelectedBrand}
+          onValueChange={handleBrandChange}
         >
           <SelectTrigger size="shoping-page" className="w-full h-14">
             <SelectValue placeholder="برند موبایل" />
@@ -87,22 +113,23 @@ function ActionButtons() {
 
         <Select
           value={selectedModel || undefined}
-          onValueChange={setSelectedModel}
+          onValueChange={handleModelChange}
           disabled={!selectedBrand || loadingModels || !!error}
         >
           <SelectTrigger size="shoping-page" className="w-full h-14">
-            <SelectValue
-              placeholder={
-                loadingModels
+            {selectedModel ? (
+              <SelectValue />
+            ) : (
+              <span className="text-muted-foreground text-sm">
+                {loadingModels
                   ? "در حال بارگیری..."
-                  : error
-                  ? error
                   : !selectedBrand
                   ? "ابتدا برند را انتخاب کنید"
-                  : "مدل موبایل"
-              }
-            />
+                  : "مدل موبایل را انتخاب کنید"}
+              </span>
+            )}
           </SelectTrigger>
+
           <SelectContent>
             {models.length > 0 ? (
               models.map((model) => (
@@ -127,11 +154,6 @@ function ActionButtons() {
       >
         افزودن به سبد خرید
       </button>
-
-      {/* نمایش خطا به صورت جداگانه */}
-      {error && !loadingModels && (
-        <div className="text-red-500 text-sm text-center">{error}</div>
-      )}
     </div>
   );
 }

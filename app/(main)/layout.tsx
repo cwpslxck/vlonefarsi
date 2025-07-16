@@ -15,7 +15,7 @@ export default function RootLayout({
   return (
     <>
       <Header />
-      <main className="mx-auto container max-w-3xl p-4">{children}</main>
+      <main className="mx-auto container max-w-4xl p-4">{children}</main>
       <Footer />
     </>
   );

@@ -75,7 +75,7 @@ function Page() {
   return (
     <>
       <main className="max-w-7xl mx-auto pb-8">
-        <div className="flex flex-col md:flex-row gap-6 md:gap-12 items-start pb-4 border-b border-stone-800">
+        <div className="flex flex-col md:flex-row gap-6 md:gap-12 pb-4 border-b border-stone-800">
           {/* Product Image Section */}
           <div className="w-full md:w-1/2">
             <div className="pointer-events-none flex items-center justify-center p-8">
@@ -86,7 +86,7 @@ function Page() {
           </div>
 
           {/* Product Info Section */}
-          <div className="flex justify-start flex-col w-full gap-4">
+          <div className="flex justify-between flex-col w-full gap-4">
             <div className="flex flex-col gap-4">
               <div className="opacity-70 font-light text-sm">
                 ویلون فارسی / قاب موبایل / {design.name}
@@ -99,40 +99,17 @@ function Page() {
               </div>
             </div>
 
-            {/* Price */}
-            <div className="flex justify-start items-end gap-2">
-              <span className="text-2xl font-medium text-white">222تومان</span>
-            </div>
-
-            <div className="flex flex-col gap-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="flex items-center space-x-3 p-4 bg-stone-900 rounded-lg">
-                  <div className="bg-lime-600 p-2 rounded-lg">
-                    <div className="h-5 w-5 bg-white/20 rounded"></div>
-                  </div>
-                  <div>
-                    <p className="font-medium text-white">بالاترین کیفیت</p>
-                    <p className="text-sm text-gray-400">
-                      قابها ابعاد استاندارد گوشی رو دارن و از گوشیتون محافظت
-                      میکنن
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-3 p-4 bg-stone-900 rounded-lg">
-                  <div className="bg-lime-600 p-2 rounded-lg">
-                    <div className="h-5 w-5 bg-white/20 rounded"></div>
-                  </div>
-                  <div>
-                    <p className="font-medium text-white">همیشه موجود</p>
-                    <p className="text-sm text-gray-400">
-                      آماده سازی بعد از سفارش شما انجام میشه پس همیشه موجوده!
-                    </p>
-                  </div>
-                </div>
+            <div className="flex w-full gap-4 flex-col justify-between">
+              {/* Price */}
+              <div className="flex justify-start items-end gap-2">
+                <span className="text-2xl font-medium text-white">
+                  222تومان
+                </span>
               </div>
-              {/* Action Buttons */}
-              <ActionButtons />
+              <div className="flex flex-col gap-4">
+                {/* Action Buttons */}
+                <ActionButtons />
+              </div>
             </div>
           </div>
         </div>

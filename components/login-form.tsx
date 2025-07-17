@@ -1,20 +1,49 @@
-import { GalleryVerticalEnd } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { supabase } from "@/lib/supabase/client";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FaDiscord, FaGoogle } from "react-icons/fa";
-import Link from "next/link";
+import { FaGoogle } from "react-icons/fa";
 import Logo from "./logo";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    setLoading(false);
+
+    if (error) {
+      setError(error.message);
+    } else {
+      router.push("/");
+    }
+  };
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <form>
+      <form onSubmit={handleLogin}>
         <div className="flex flex-col gap-6">
           <div className="flex flex-col items-center gap-2">
             <Link
@@ -40,6 +69,8 @@ export function LoginForm({
                 placeholder="wtf@vlonefarsi.ir"
                 required
                 dir="ltr"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div className="grid gap-3">
@@ -50,27 +81,30 @@ export function LoginForm({
                 placeholder="••••••"
                 required
                 dir="ltr"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
-            <Button type="submit" className="w-full">
-              ورود
+
+            {error && (
+              <p className="text-sm text-red-500 text-center">{error}</p>
+            )}
+
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "در حال ورود..." : "ورود"}
             </Button>
           </div>
+
           <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
             <span className="bg-background text-muted-foreground relative z-10 px-2">
               یا
             </span>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Button variant="outline" type="button" className="w-full">
-              <FaDiscord />
-              ادامه با دیسکورد
-            </Button>
-            <Button variant="outline" type="button" className="w-full">
-              <FaGoogle />
-              ادامه با گوگل
-            </Button>
-          </div>
+
+          <Button variant="outline" disabled type="button" className="w-full">
+            <FaGoogle />
+            ادامه با گوگل
+          </Button>
         </div>
       </form>
     </div>

@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import React, { useEffect, useState } from "react";
-import { supabase } from "@/lib/supbabase/client";
+import { supabase } from "@/lib/supabase/client";
 
 interface PhoneModel {
   id: string;

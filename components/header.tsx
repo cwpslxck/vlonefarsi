@@ -109,7 +109,7 @@ function Header() {
               <BsInstagram />
             </Link>
             <Link
-              href={"/profile"}
+              href={"/login"}
               className="size-8 flex rounded-md items-center justify-center cursor-pointer hoveranim bg-foreground text-background"
             >
               <FaUserAlt />

@@ -2,7 +2,7 @@
 import Card from "@/features/phonecase/card";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { supabase } from "@/lib/supbabase/client";
+import { supabase } from "@/lib/supabase/client";
 import ActionButtons from "@/features/phonecase/action-buttons";
 
 interface Design {
@@ -74,11 +74,11 @@ function Page() {
 
   return (
     <>
-      <main className="max-w-7xl mx-auto pb-8">
+      <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row gap-6 md:gap-12 pb-4 border-b border-stone-800">
           {/* Product Image Section */}
           <div className="w-full md:w-1/2">
-            <div className="pointer-events-none flex items-center justify-center p-8">
+            <div className="pointer-events-none flex items-center justify-center p-4 md:p-0">
               <div className="w-1/2 md:w-full">
                 <Card image_url={design.image_url} />
               </div>
@@ -113,7 +113,7 @@ function Page() {
             </div>
           </div>
         </div>
-      </main>
+      </div>
     </>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect } from "react";
 import Card from "./card";
-import { supabase } from "@/lib/supbabase/client";
+import { supabase } from "@/lib/supabase/client";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
 import ContainerSkeleton from "./container-skeleton";

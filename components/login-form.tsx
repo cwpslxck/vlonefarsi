@@ -46,7 +46,7 @@ export function LoginForm({
       return;
     }
 
-    router.push("/");
+    router.push("/dashboard");
     setLoading(false);
   };
 

@@ -52,8 +52,10 @@ function PriceDisplay({ modelId, onResult }: PriceDisplayProps) {
     fetchPrice();
   }, [modelId]);
 
-  if (loading || modelId === "")
-    return <Skeleton className="h-8 w-28"></Skeleton>;
+  if (modelId === "") {
+    return;
+  }
+  if (loading) return <Skeleton className="h-8 w-28"></Skeleton>;
   if (!available || price === null)
     return <span className="text-red-500">ناموجود :(</span>;
 

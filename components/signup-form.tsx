@@ -18,6 +18,7 @@ export function SignupForm({
 }: React.ComponentProps<"div">) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -27,9 +28,14 @@ export function SignupForm({
     setLoading(true);
     setError(null);
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          displayName: name,
+        },
+      },
     });
 
     setLoading(false);
@@ -83,6 +89,16 @@ export function SignupForm({
                 dir="ltr"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+            <div className="grid gap-3">
+              <Label htmlFor="name">اسم</Label>
+              <Input
+                id="name"
+                type="text"
+                placeholder="دوست داری چی صدات کنیم؟"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
               />
             </div>
 

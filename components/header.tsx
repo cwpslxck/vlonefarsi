@@ -4,9 +4,12 @@ import { BsInstagram } from "react-icons/bs";
 import { FaUserAlt } from "react-icons/fa";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { usePathname } from "next/navigation";
+import Logo from "./logo";
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   const items = [
     {
@@ -31,22 +34,22 @@ function Header() {
     };
   }, [isMenuOpen]);
 
+  useEffect(() => {
+    if (!isMenuOpen) return;
+
+    const timeout = setTimeout(() => {
+      setIsMenuOpen(false);
+    }, 300);
+
+    return () => clearTimeout(timeout);
+  }, [pathname]);
+
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  const closeMenu = () => {
-    setIsMenuOpen(false);
-  };
-
   return (
     <>
-      {/* <div className="pointer-events-none p-2 break-all text-xs sm:text-lg select-none w-full bg-foreground h-12 text-background font-bold flex justify-center items-center gap-1">
-        کد تخفیف 30% به مناسبت افتتاح وبسایت
-        <span className="bg-red-600 font-medium text-xs sm:text-[1rem] text-white px-2 py-1 rounded">
-          I-LOVE-VF
-        </span>
-      </div> */}
       <div
         className={cn(
           `flex z-50 overflow-hidden flex-col sticky top-0 w-full`,
@@ -62,18 +65,13 @@ function Header() {
               aria-label="Menu"
             >
               <span
-                className={`w-5 h-0.5 bg-foreground transition-all duration-300 ${
-                  isMenuOpen ? "rotate-45 translate-y-1.5" : ""
+                className={`w-6 h-1 bg-foreground rounded-full origin-center transition-transform duration-300 ${
+                  isMenuOpen ? "rotate-45 translate-y-1" : ""
                 }`}
               ></span>
               <span
-                className={`w-5 h-0.5 bg-foreground transition-all duration-300 ${
-                  isMenuOpen ? "opacity-0" : ""
-                }`}
-              ></span>
-              <span
-                className={`w-5 h-0.5 bg-foreground transition-all duration-300 ${
-                  isMenuOpen ? "-rotate-45 -translate-y-1.5" : ""
+                className={`w-6 h-1 bg-foreground rounded-full origin-center transition-transform duration-300 ${
+                  isMenuOpen ? "-rotate-45 -translate-y-1" : ""
                 }`}
               ></span>
             </button>
@@ -122,7 +120,7 @@ function Header() {
         <div className="fixed inset-0 z-40 md:hidden">
           <div
             className="absolute inset-0 bg-background/70 backdrop-blur-xl"
-            onClick={closeMenu}
+            onClick={() => setIsMenuOpen(false)}
           ></div>
 
           <div
@@ -131,16 +129,34 @@ function Header() {
             }`}
           >
             <div className="flex flex-col px-6 pt-20 gap-2">
-              {items.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="flex items-center gap-2 text-white text-lg font-medium py-2 hoveranim"
-                  onClick={closeMenu}
-                >
-                  {item.title}
-                </Link>
-              ))}
+              <div className="w-full flex justify-center">
+                <Logo />
+              </div>
+              {items.map((item) => {
+                const isCurrentPage = item.href === pathname;
+
+                return isCurrentPage ? (
+                  <button
+                    key={item.href}
+                    onClick={() =>
+                      setTimeout(() => {
+                        setIsMenuOpen(false);
+                      }, 200)
+                    }
+                    className="flex items-center hover:bg-foreground/5 rounded-md transition-colors w-full justify-center gap-2 text-white text-lg font-medium py-2 hoveranim"
+                  >
+                    {item.title}
+                  </button>
+                ) : (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="flex items-center hover:bg-foreground/5 rounded-md transition-colors w-full justify-center gap-2 text-white text-lg font-medium py-2 hoveranim"
+                  >
+                    {item.title}
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </div>

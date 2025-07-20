@@ -1,11 +1,5 @@
-import type { Metadata } from "next";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
-
-export const metadata: Metadata = {
-  title: "VLONEFARSI",
-  description: "CUSTOM PHONECASE ONLINESHOP",
-};
 
 export default function MainLayout({
   children,

@@ -2,10 +2,16 @@ import { Rubik } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import ReactQueryProvider from "@/components/providers/query-client-provider";
+import { Metadata } from "next";
 
 const font = Rubik({
   subsets: ["arabic"],
 });
+
+export const metadata: Metadata = {
+  title: "VLONEFARSI",
+  description: "CUSTOM PHONECASE ONLINESHOP",
+};
 
 export default function RootLayout({
   children,

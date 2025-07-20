@@ -5,7 +5,7 @@ export default function Home() {
       <div className="">
         <div className="w-full aspect-2/1 bg-violet-400/30 rounded-xl"></div>
       </div>
-      <Container limit={6} />
+      {/* <Container limit={6} /> */}
     </div>
   );
 }

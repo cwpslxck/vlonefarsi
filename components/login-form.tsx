@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase/client";
+import { supabase } from "@/utils/supabase/client";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -27,18 +27,27 @@ export function LoginForm({
     setLoading(true);
     setError(null);
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
-    setLoading(false);
-
     if (error) {
-      setError(error.message);
-    } else {
-      router.push("/");
+      if (error.message.toLowerCase().includes("invalid login credentials")) {
+        setError("ایمیل یا رمز اشتباهه.");
+      } else {
+        setError(error.message);
+      }
+      return;
     }
+
+    if (!data.session) {
+      setError("ورود ناموفق. لطفا دوباره تلاش کن.");
+      return;
+    }
+
+    router.push("/");
+    setLoading(false);
   };
 
   return (

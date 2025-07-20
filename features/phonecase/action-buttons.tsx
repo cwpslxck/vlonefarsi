@@ -8,7 +8,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import React, { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase/client";
+import { supabase } from "@/utils/supabase/client";
+import PriceDisplay from "./price-display";
 
 interface PhoneModel {
   id: string;
@@ -22,6 +23,8 @@ function ActionButtons() {
   const [models, setModels] = useState<PhoneModel[]>([]);
   const [loadingModels, setLoadingModels] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [available, setAvailable] = useState(false);
+  const [price, setPrice] = useState<number | null>(null);
 
   const [brands] = useState([
     { id: "iphone", name: "iPhone - آیفون" },
@@ -92,8 +95,19 @@ function ActionButtons() {
     setSelectedModel(model);
     localStorage.setItem("user_phone_model", model);
   };
+
   return (
     <div className="space-y-4">
+      <div className="text-2xl font-medium min-h-12 flex items-end">
+        <PriceDisplay
+          modelId={selectedModel || ""}
+          onResult={(p, a) => {
+            setPrice(p);
+            setAvailable(a);
+          }}
+        />
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Select
           value={selectedBrand || undefined}
@@ -147,10 +161,8 @@ function ActionButtons() {
       </div>
 
       <button
-        className={`w-full bg-white text-black font-medium py-4 px-6 rounded-lg transition-colors ${
-          selectedModel ? "hover:bg-gray-100" : "opacity-50 cursor-not-allowed"
-        }`}
-        disabled={!selectedModel}
+        className="w-full bg-white text-black font-medium py-4 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled={!selectedModel || !available || price === null}
       >
         افزودن به سبد خرید
       </button>

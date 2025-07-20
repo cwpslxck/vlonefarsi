@@ -2,7 +2,7 @@
 import Card from "@/features/phonecase/card";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { supabase } from "@/lib/supabase/client";
+import { supabase } from "@/utils/supabase/client";
 import ActionButtons from "@/features/phonecase/action-buttons";
 
 interface Design {
@@ -75,7 +75,7 @@ function Page() {
   return (
     <>
       <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row gap-6 md:gap-12 pb-4 border-b border-stone-800">
+        <div className="flex flex-col md:flex-row gap-6 md:gap-12 pb-4">
           {/* Product Image Section */}
           <div className="w-full md:w-1/2">
             <div className="pointer-events-none flex items-center justify-center p-4 md:p-0">
@@ -93,24 +93,12 @@ function Page() {
               </div>
               {/* Title */}
               <div className="space-y-4">
-                <h1 className="text-4xl sm:text-5xl font-bold text-white leading-tight">
+                <h1 className="text-4xl md:text-5xl text-left md:text-start font-bold text-white leading-tight">
                   {design.name}
                 </h1>
               </div>
             </div>
-
-            <div className="flex w-full gap-4 flex-col justify-between">
-              {/* Price */}
-              <div className="flex justify-start items-end gap-2">
-                <span className="text-2xl font-medium text-white">
-                  222تومان
-                </span>
-              </div>
-              <div className="flex flex-col gap-4">
-                {/* Action Buttons */}
-                <ActionButtons />
-              </div>
-            </div>
+            <ActionButtons />
           </div>
         </div>
       </div>

@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect } from "react";
 import Card from "./card";
-import { supabase } from "@/lib/supabase/client";
+import { supabase } from "@/utils/supabase/client";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
 import ContainerSkeleton from "./container-skeleton";
@@ -32,7 +32,7 @@ const fetchDesignsPaginated = async ({ pageParam = 0 }) => {
     .from("designs")
     .select("*")
     .range(pageParam, pageParam + pageSize - 1)
-    .order("design", { ascending: false });
+    .order("id", { ascending: false });
 
   if (error) throw error;
 
@@ -47,7 +47,7 @@ const fetchDesignsLimited = async (limit: number) => {
     .from("designs")
     .select("*")
     .limit(limit)
-    .order("design", { ascending: false });
+    .order("id", { ascending: false });
 
   if (error) throw error;
   return data;

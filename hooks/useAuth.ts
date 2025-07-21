@@ -10,10 +10,11 @@ export function useAuth() {
 
   useEffect(() => {
     const checkUser = async () => {
-      const { data } = await supabase.auth.getUser();
+      const { data } = await supabase.auth.getSession();
 
-      if (data?.user) {
-        setUser(data.user);
+      if (data?.session?.user) {
+        setUser(data.session.user);
+        document.cookie = `auth_token=${data.session.access_token}; path=/; SameSite=Lax`;
       } else {
         router.push("/login");
         return;
@@ -28,10 +29,12 @@ export function useAuth() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_OUT" || !session) {
+        document.cookie = `auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
         router.push("/login");
       } else if (session?.user) {
         setUser(session.user);
         setLoading(false);
+        document.cookie = `auth_token=${session.access_token}; path=/; SameSite=Lax`;
       }
     });
 

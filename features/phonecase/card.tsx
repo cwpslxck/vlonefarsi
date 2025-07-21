@@ -16,8 +16,8 @@ function Card({
       <Link className="h-full w-full" href={href || ""}>
         <div className="absolute w-full h-full top-0 right-0 left-0">
           <Image
-            width={150}
-            height={150}
+            width={120}
+            height={120}
             src={image_url || "/images/card-default.jpg"}
             alt={name || "قاب موبایل"}
             loading="lazy"

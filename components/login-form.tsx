@@ -38,13 +38,17 @@ export function LoginForm({
       } else {
         setError(error.message);
       }
+      setLoading(false);
       return;
     }
 
     if (!data.session) {
       setError("ورود ناموفق. لطفا دوباره تلاش کن.");
+      setLoading(false);
       return;
     }
+
+    document.cookie = `auth_token=${data.session.access_token}; path=/; SameSite=Lax`;
 
     router.push("/dashboard");
     setLoading(false);

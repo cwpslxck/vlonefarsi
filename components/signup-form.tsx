@@ -28,7 +28,7 @@ export function SignupForm({
     setLoading(true);
     setError(null);
 
-    const { data, error } = await supabase.auth.signUp({
+    const { error: signupError } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -38,13 +38,28 @@ export function SignupForm({
       },
     });
 
-    setLoading(false);
-
-    if (error) {
-      setError(error.message);
-    } else {
-      router.push("/");
+    if (signupError) {
+      setLoading(false);
+      setError(signupError.message);
+      return;
     }
+
+    const { data: signInData, error: signInError } =
+      await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+    if (signInError) {
+      setLoading(false);
+      setError(signInError.message);
+      return;
+    }
+
+    document.cookie = `auth_token=${signInData.session.access_token}; path=/; SameSite=Lax`;
+
+    setLoading(false);
+    router.push("/");
   };
 
   return (

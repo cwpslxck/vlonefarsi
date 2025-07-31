@@ -28,38 +28,65 @@ export function SignupForm({
     setLoading(true);
     setError(null);
 
-    const { error: signupError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          displayName: name,
-        },
-      },
-    });
+    try {
+      const { data: signupData, error: signupError } =
+        await supabase.auth.signUp({
+          email: email.trim().toLowerCase(),
+          password,
+          options: {
+            data: {
+              displayName: name,
+            },
+          },
+        });
 
-    if (signupError) {
+      if (signupError) {
+        if (signupError.message.includes("already registered")) {
+          setError("این ایمیل از قبل وجود داره!");
+        } else if (signupError.message.includes("Password should be")) {
+          setError("پسورد باید حداقل ۶ کاراکتر باشه.");
+        }
+        setLoading(false);
+        return;
+      }
+
+      if (signupData.session) {
+        document.cookie = `auth_token=${signupData.session.access_token}; path=/; SameSite=Lax; Secure`;
+        router.push("/dashboard");
+        setLoading(false);
+        return;
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      const { data: signInData, error: signInError } =
+        await supabase.auth.signInWithPassword({
+          email: email.trim().toLowerCase(),
+          password,
+        });
+
+      if (signInError) {
+        if (signInError.message.includes("Invalid login credentials")) {
+          setError("مشکلی در ثبت‌نام پیش اومد.");
+        }
+        setLoading(false);
+        return;
+      }
+
+      if (!signInData.session) {
+        setError("مشکلی در ورود پیش اومد. لطفاً از صفحه ورود تلاش کن.");
+        setLoading(false);
+        return;
+      }
+
+      document.cookie = `auth_token=${signInData.session.access_token}; path=/; SameSite=Lax; Secure`;
+      router.push("/dashboard");
+    } catch (err) {
+      console.error("Signup error:", err);
+      setError("خطای غیرمنتظره‌ای رخ داد. لطفاً دوباره تلاش کن.");
+    } finally {
       setLoading(false);
-      setError(signupError.message);
-      return;
     }
-
-    const { data: signInData, error: signInError } =
-      await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-    if (signInError) {
-      setLoading(false);
-      setError(signInError.message);
-      return;
-    }
-
-    document.cookie = `auth_token=${signInData.session.access_token}; path=/; SameSite=Lax`;
-
-    setLoading(false);
-    router.push("/");
   };
 
   return (
@@ -102,6 +129,7 @@ export function SignupForm({
                 placeholder="••••••"
                 required
                 dir="ltr"
+                minLength={6}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -131,7 +159,7 @@ export function SignupForm({
               یا
             </span>
           </div>
-          <Button variant="outline" type="button" className="w-full">
+          <Button variant="outline" disabled type="button" className="w-full">
             <FaGoogle />
             ادامه با گوگل
           </Button>

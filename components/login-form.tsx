@@ -27,31 +27,35 @@ export function LoginForm({
     setLoading(true);
     setError(null);
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password,
+      });
 
-    if (error) {
-      if (error.message.toLowerCase().includes("invalid login credentials")) {
-        setError("ایمیل یا رمز اشتباهه.");
-      } else {
-        setError(error.message);
+      if (error) {
+        if (error.message.toLowerCase().includes("invalid login credentials")) {
+          setError("ایمیل یا رمز اشتباهه.");
+        } else if (error.message.toLowerCase().includes("too many requests")) {
+          setError("لطفا یکم صبر کن و دوباره تلاش کن.");
+        }
+        return;
       }
+
+      if (!data.session) {
+        setError("ورود ناموفق. لطفا دوباره تلاش کن.");
+        return;
+      }
+
+      document.cookie = `auth_token=${data.session.access_token}; path=/; SameSite=Lax; Secure`;
+
+      router.push("/dashboard");
+    } catch (err) {
+      console.error("Login error:", err);
+      setError("خطای غیرمنتظره‌ای رخ داد. لطفاً دوباره تلاش کن.");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    if (!data.session) {
-      setError("ورود ناموفق. لطفا دوباره تلاش کن.");
-      setLoading(false);
-      return;
-    }
-
-    document.cookie = `auth_token=${data.session.access_token}; path=/; SameSite=Lax`;
-
-    router.push("/dashboard");
-    setLoading(false);
   };
 
   return (
@@ -79,7 +83,7 @@ export function LoginForm({
               <Input
                 id="email"
                 type="email"
-                placeholder="wtf@vlonefarsi.ir"
+                placeholder="hey@vlonefarsi.ir"
                 required
                 dir="ltr"
                 value={email}

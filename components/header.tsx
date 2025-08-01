@@ -6,21 +6,11 @@ import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import Logo from "./logo";
+import { MENU_ITEMS } from "@/constants/menu-item";
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
-
-  const items = [
-    {
-      title: "قاب‌ها",
-      href: "/phonecase",
-    },
-    {
-      title: "طرح دلخواه",
-      href: "/phonecase/custom",
-    },
-  ];
 
   useEffect(() => {
     if (isMenuOpen) {
@@ -83,7 +73,7 @@ function Header() {
               ویلون فارسی
             </Link>
             <ul className="hidden md:inline-flex gap-4">
-              {items.map((item) => (
+              {MENU_ITEMS.map((item) => (
                 <li
                   className="inline-flex gap-0.5 items-center"
                   key={item.href}
@@ -132,7 +122,7 @@ function Header() {
               <div className="w-full flex justify-center">
                 <Logo />
               </div>
-              {items.map((item) => {
+              {MENU_ITEMS.map((item) => {
                 const isCurrentPage = item.href === pathname;
 
                 return isCurrentPage ? (

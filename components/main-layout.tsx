@@ -7,10 +7,12 @@ export default function MainLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <>
-      <Header />
-      <main className="mx-auto container max-w-4xl p-4">{children}</main>
+    <div className="flex justify-between flex-col items-center">
+      <div className="w-full min-h-dvh">
+        <Header />
+        <main className="mx-auto container max-w-4xl p-4">{children}</main>
+      </div>
       <Footer />
-    </>
+    </div>
   );
 }

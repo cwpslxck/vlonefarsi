@@ -46,7 +46,7 @@ function Header() {
           isMenuOpen ? "bg-transparent" : "bg-background/70 backdrop-blur-xl"
         )}
       >
-        <div className="flex mx-auto container items-center h-14 w-full justify-between px-4">
+        <div className="flex mx-auto container items-center h-16 w-full justify-between px-4">
           <div className="inline-flex gap-2 md:gap-6 items-center">
             {/* Hamburger Menu Button */}
             <button

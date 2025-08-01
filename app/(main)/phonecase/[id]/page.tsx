@@ -48,10 +48,6 @@ function Page() {
     }
   }, [params.id]);
 
-  const formatPrice = (price: number) => {
-    return Math.round(price / 1000);
-  };
-
   if (loading) {
     return (
       <main className="max-w-7xl mx-auto pb-8">

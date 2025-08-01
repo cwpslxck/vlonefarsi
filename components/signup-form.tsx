@@ -17,6 +17,7 @@ export function SignupForm({
   ...props
 }: React.ComponentProps<"div">) {
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
@@ -31,8 +32,8 @@ export function SignupForm({
     try {
       const { data: signupData, error: signupError } =
         await supabase.auth.signUp({
-          email: email.trim().toLowerCase(),
-          password,
+          phone: phone,
+          password: password,
           options: {
             data: {
               displayName: name,
@@ -61,8 +62,8 @@ export function SignupForm({
 
       const { data: signInData, error: signInError } =
         await supabase.auth.signInWithPassword({
-          email: email.trim().toLowerCase(),
-          password,
+          phone: phone,
+          password: password,
         });
 
       if (signInError) {
@@ -110,15 +111,15 @@ export function SignupForm({
           </div>
           <div className="flex flex-col gap-6">
             <div className="grid gap-3">
-              <Label htmlFor="email">ایمیل</Label>
+              <Label htmlFor="email">tel</Label>
               <Input
-                id="email"
-                type="email"
-                placeholder="wtf@vlonefarsi.ir"
+                id="phone"
+                type="tel"
+                placeholder="09171234567"
                 required
                 dir="ltr"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
               />
             </div>
             <div className="grid gap-3">

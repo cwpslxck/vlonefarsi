@@ -52,7 +52,7 @@ export function NavUser() {
                     {user?.user_metadata?.displayName}
                   </span>
                   <span className="truncate text-xs text-muted-foreground">
-                    {user?.email}
+                    {user?.phone || user?.email}
                   </span>
                   {loading && (
                     <div className="grid gap-0.5 flex-1">
@@ -82,7 +82,8 @@ export function NavUser() {
                     {user?.user_metadata?.displayName}
                   </span>
                   <span className="truncate text-xs text-muted-foreground">
-                    {user?.email}
+                    {user?.phone || user?.email}
+                    {/* TODO: create a global comp that gets number with +98 and pass it with 0916 folan cuz we need it lots of where */}
                   </span>
                 </div>
                 <Avatar className="size-8 rounded-lg">

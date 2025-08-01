@@ -16,7 +16,8 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const [email, setEmail] = useState("");
+  // const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,8 +30,9 @@ export function LoginForm({
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim().toLowerCase(),
-        password,
+        // email: email.trim().toLowerCase(),
+        phone: phone,
+        password: password,
       });
 
       if (error) {
@@ -48,12 +50,10 @@ export function LoginForm({
       }
 
       document.cookie = `auth_token=${data.session.access_token}; path=/; SameSite=Lax; Secure`;
-
-      router.push("/dashboard");
+      router.refresh();
     } catch (err) {
-      console.error("Login error:", err);
+      console.log("Login error:", err);
       setError("خطای غیرمنتظره‌ای رخ داد. لطفاً دوباره تلاش کن.");
-    } finally {
       setLoading(false);
     }
   };
@@ -79,15 +79,15 @@ export function LoginForm({
           </div>
           <div className="flex flex-col gap-6">
             <div className="grid gap-3">
-              <Label htmlFor="email">ایمیل</Label>
+              <Label htmlFor="email">tel</Label>
               <Input
-                id="email"
-                type="email"
-                placeholder="hey@vlonefarsi.ir"
+                id="phone"
+                type="tel"
+                placeholder="09171234567"
                 required
                 dir="ltr"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
               />
             </div>
             <div className="grid gap-3">

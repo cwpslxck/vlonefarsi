@@ -1,12 +1,13 @@
 "use client";
 import Link from "next/link";
-import { BsInstagram } from "react-icons/bs";
+import { BsBasket, BsInstagram } from "react-icons/bs";
 import { FaUserAlt } from "react-icons/fa";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import Logo from "./logo";
 import { MENU_ITEMS } from "@/constants/menu-item";
+import { ShoppingBagIcon } from "lucide-react";
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -89,12 +90,8 @@ function Header() {
             </ul>
           </div>
           <div className="inline-flex items-center text-xl gap-3">
-            <Link
-              target="_blank"
-              href={"https://instagram.com/vlonefarsi"}
-              className="p-1 cursor-pointer hoveranim"
-            >
-              <BsInstagram />
+            <Link href={"/buy"} className="p-1 cursor-pointer hoveranim">
+              <ShoppingBagIcon />
             </Link>
             <Link
               href={"/dashboard"}

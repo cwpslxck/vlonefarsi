@@ -10,6 +10,8 @@ import {
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabase/client";
 import PriceDisplay from "./price-display";
+import { useRouter } from "next/navigation";
+import { useProtectedAction } from "@/hooks/use-protected-action";
 
 interface PhoneModel {
   id: string;
@@ -17,7 +19,11 @@ interface PhoneModel {
   model: string;
 }
 
-function ActionButtons() {
+interface ActionButtonsProps {
+  designId: string;
+}
+
+function ActionButtons({ designId }: ActionButtonsProps) {
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
   const [models, setModels] = useState<PhoneModel[]>([]);
@@ -25,6 +31,8 @@ function ActionButtons() {
   const [error, setError] = useState<string | null>(null);
   const [available, setAvailable] = useState(false);
   const [price, setPrice] = useState<number | null>(null);
+  const router = useRouter();
+  const { protect } = useProtectedAction();
 
   const [brands] = useState([
     { id: "iphone", name: "iPhone - آیفون" },
@@ -96,6 +104,32 @@ function ActionButtons() {
     localStorage.setItem("user_phone_model", model);
   };
 
+  const handleAddToCart = protect(async () => {
+    try {
+      const res = await fetch("/api/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          design_id: designId,
+          phone_model_id: selectedModel,
+          quantity: 1,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "خطا در افزودن به سبد خرید");
+      } else {
+        router.push("/buy");
+      }
+    } catch (err) {
+      console.log(err);
+      setError("خطای شبکه");
+    }
+  });
+
   return (
     <div className="space-y-4">
       <div className="text-2xl font-medium min-h-12 flex items-end">
@@ -163,9 +197,12 @@ function ActionButtons() {
       <button
         className="w-full bg-white text-black font-medium py-4 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         disabled={!selectedModel || !available || price === null}
+        onClick={handleAddToCart}
       >
         افزودن به سبد خرید
       </button>
+
+      {error && <p className="text-red-500 mt-2">{error}</p>}
     </div>
   );
 }

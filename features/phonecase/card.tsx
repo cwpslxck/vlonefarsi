@@ -12,7 +12,7 @@ function Card({
   name?: string;
 }) {
   return (
-    <div className="aspect-[9/18] w-full border border-stone-700 hover:-translate-y-[1px] duration-300 bg-stone-900 rounded-3xl overflow-hidden relative cursor-pointer">
+    <div className="aspect-[9/18] w-full border border-stone-700 hover:-translate-y-[1px] duration-300 bg-stone-900 rounded-2xl overflow-hidden relative cursor-pointer">
       <Link className="h-full w-full" href={href || ""}>
         <div className="absolute w-full h-full top-0 right-0 left-0">
           <Image

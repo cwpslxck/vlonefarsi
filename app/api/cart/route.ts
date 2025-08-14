@@ -1,46 +1,54 @@
 import { createServerSupabaseClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import type { User } from "@supabase/supabase-js";
 
-async function getAuthenticatedUser() {
+// Common error responses
+const UNAUTHORIZED_RESPONSE = NextResponse.json(
+  { error: "Unauthorized" },
+  { status: 401 }
+);
+const INTERNAL_ERROR_RESPONSE = NextResponse.json(
+  { error: "Internal server error" },
+  { status: 500 }
+);
+
+// Shared authentication logic
+async function authenticateAndGetSupabase(): Promise<
+  { user: User; supabase: any } | { error: NextResponse }
+> {
   try {
     const cookieStore = await cookies();
     const authToken = cookieStore.get("auth_token")?.value;
 
     if (!authToken) {
-      return { user: null, error: "No auth token found" };
+      return { error: UNAUTHORIZED_RESPONSE };
     }
 
     const supabase = createServerSupabaseClient();
-
     const {
       data: { user },
       error,
     } = await supabase.auth.getUser(authToken);
 
     if (error || !user) {
-      return { user: null, error: error?.message || "User not found" };
+      return { error: UNAUTHORIZED_RESPONSE };
     }
 
-    return { user, error: null };
+    return { user, supabase };
   } catch (err) {
     console.error("Auth error:", err);
-    return { user: null, error: "Authentication failed" };
+    return { error: UNAUTHORIZED_RESPONSE };
   }
 }
 
 export async function GET() {
+  const authResult = await authenticateAndGetSupabase();
+  if ("error" in authResult) return authResult.error;
+
+  const { user, supabase } = authResult;
+
   try {
-    const { user, error: authError } = await getAuthenticatedUser();
-
-    if (authError || !user) {
-      console.log("GET - Auth failed:", authError);
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    console.log("GET - User authenticated:", user.id);
-
-    const supabase = createServerSupabaseClient();
     const { data, error } = await supabase
       .from("cart_items")
       .select(
@@ -61,24 +69,18 @@ export async function GET() {
     return NextResponse.json(data || []);
   } catch (error) {
     console.error("GET - Unexpected error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return INTERNAL_ERROR_RESPONSE;
   }
 }
 
 export async function POST(req: Request) {
+  const authResult = await authenticateAndGetSupabase();
+  if ("error" in authResult) return authResult.error;
+
+  const { user, supabase } = authResult;
+
   try {
-    const { user, error: authError } = await getAuthenticatedUser();
-
-    if (authError || !user) {
-      console.log("POST - Auth failed:", authError);
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const body = await req.json();
-    const { design_id, phone_model_id, quantity = 1 } = body;
+    const { design_id, phone_model_id, quantity = 1 } = await req.json();
 
     if (!design_id || !phone_model_id) {
       return NextResponse.json(
@@ -87,14 +89,6 @@ export async function POST(req: Request) {
       );
     }
 
-    console.log("POST - Adding item:", {
-      user_id: user.id,
-      design_id,
-      phone_model_id,
-      quantity,
-    });
-
-    const supabase = createServerSupabaseClient();
     const { error } = await supabase.from("cart_items").upsert(
       {
         user_id: user.id,
@@ -116,31 +110,23 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("POST - Unexpected error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return INTERNAL_ERROR_RESPONSE;
   }
 }
 
 export async function DELETE(req: Request) {
+  const authResult = await authenticateAndGetSupabase();
+  if ("error" in authResult) return authResult.error;
+
+  const { user, supabase } = authResult;
+
   try {
-    const { user, error: authError } = await getAuthenticatedUser();
-
-    if (authError || !user) {
-      console.log("DELETE - Auth failed:", authError);
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const { id } = await req.json();
 
     if (!id) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
 
-    console.log("DELETE - Removing item:", { id, user_id: user.id });
-
-    const supabase = createServerSupabaseClient();
     const { error } = await supabase
       .from("cart_items")
       .delete()
@@ -155,22 +141,17 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("DELETE - Unexpected error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return INTERNAL_ERROR_RESPONSE;
   }
 }
 
 export async function PATCH(req: Request) {
+  const authResult = await authenticateAndGetSupabase();
+  if ("error" in authResult) return authResult.error;
+
+  const { user, supabase } = authResult;
+
   try {
-    const { user, error: authError } = await getAuthenticatedUser();
-
-    if (authError || !user) {
-      console.log("PATCH - Auth failed:", authError);
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const { id, quantity } = await req.json();
 
     if (!id || quantity === undefined) {
@@ -180,9 +161,6 @@ export async function PATCH(req: Request) {
       );
     }
 
-    console.log("PATCH - Updating item:", { id, quantity, user_id: user.id });
-
-    const supabase = createServerSupabaseClient();
     const { error } = await supabase
       .from("cart_items")
       .update({
@@ -200,9 +178,6 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("PATCH - Unexpected error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return INTERNAL_ERROR_RESPONSE;
   }
 }

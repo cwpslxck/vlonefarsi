@@ -153,10 +153,11 @@ export default function CartPage() {
           </div>
 
           <Button
-            className="w-full mt-4"
-            onClick={() => alert("بزن بریم تسویه حساب 🔥")}
+            className="w-full hoveranim bg-white text-black font-medium py-4 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            size={"lg"}
+            onClick={() => alert("ayo")}
           >
-            ادامه فرآیند خرید
+            افزودن به سبد خرید
           </Button>
         </div>
       )}

@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect } from "react";
 import Card from "./card";
-import { supabase } from "@/utils/supabase/client";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useInView } from "react-intersection-observer";
 import ContainerSkeleton from "./container-skeleton";
@@ -13,44 +12,39 @@ type ContainerProps = {
   limit?: number;
 };
 
-const createSlug = (text: string) => {
-  return text
-    .trim()
-    .replace(/\s+/g, "-")
-    .replace(/\-\-+/g, "-")
-    .replace(/^-+/, "")
-    .replace(/-+$/, "");
-};
-
-const INITIAL_PAGE_SIZE = 6;
-const SUBSEQUENT_PAGE_SIZE = 4;
-
 const fetchDesignsPaginated = async ({ pageParam = 0 }) => {
-  const pageSize = pageParam === 0 ? INITIAL_PAGE_SIZE : SUBSEQUENT_PAGE_SIZE;
+  const response = await fetch(`/api/phonecase?page=${pageParam}`);
 
-  const { data, error } = await supabase
-    .from("designs")
-    .select("*")
-    .range(pageParam, pageParam + pageSize - 1)
-    .order("id", { ascending: false });
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
 
-  if (error) throw error;
+  const result = await response.json();
+
+  if (result.error) {
+    throw new Error(result.error);
+  }
 
   return {
-    data,
-    nextPage: data.length === pageSize ? pageParam + pageSize : undefined,
+    data: result.data,
+    nextPage: result.nextPage,
   };
 };
 
-const fetchDesignsLimited = async (limit: number) => {
-  const { data, error } = await supabase
-    .from("designs")
-    .select("*")
-    .limit(limit)
-    .order("id", { ascending: false });
+const fetchDesignsRandom = async (limit: number) => {
+  const response = await fetch(`/api/phonecase?limit=${limit}`);
 
-  if (error) throw error;
-  return data;
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const result = await response.json();
+
+  if (result.error) {
+    throw new Error(result.error);
+  }
+
+  return result.data || [];
 };
 
 export default function Container({ limit }: ContainerProps) {
@@ -60,19 +54,18 @@ export default function Container({ limit }: ContainerProps) {
     rootMargin: "300px",
   });
 
-  // حالت limit مشخص شده
   const {
     data: limitedData,
     isLoading: isLimitedLoading,
     error: limitedError,
   } = useQuery({
-    queryKey: ["products", "phonecases", limit],
-    queryFn: () => fetchDesignsLimited(limit!),
+    queryKey: ["products", "phonecases", "random", limit],
+    queryFn: () => fetchDesignsRandom(limit!),
     enabled: !!limit,
-    staleTime: 1000 * 60 * 10,
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
   });
 
-  // حالت infinite
   const {
     data: infiniteData,
     error: infiniteError,
@@ -93,7 +86,17 @@ export default function Container({ limit }: ContainerProps) {
     if (inView && hasNextPage && !isFetchingNextPage && !limit) {
       fetchNextPage();
     }
-  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage, inView, limit]);
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage, limit]);
+
+  // Handle errors
+  if (limitedError || infiniteError) {
+    console.error("Container Error:", limitedError || infiniteError);
+    return (
+      <div className="text-center py-8">
+        <p className="text-red-500">خطا در بارگذاری داده‌ها</p>
+      </div>
+    );
+  }
 
   if (limit) {
     if (isLimitedLoading || !limitedData || limitedData.length === 0)
@@ -102,7 +105,7 @@ export default function Container({ limit }: ContainerProps) {
     return (
       <div>
         <div className="flex justify-between items-center mb-2">
-          <p className="text-xl text-center font-semibold">جدیدترین قاب‌ها</p>
+          <p className="text-xl text-center font-semibold">قاب‌های پیشنهادی</p>
           <Link
             href={"/phonecase"}
             className="flex justify-center py-2 font-light text-sm items-center gap-1"
@@ -112,7 +115,7 @@ export default function Container({ limit }: ContainerProps) {
           </Link>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {limitedData.map((design) => (
+          {limitedData.map((design: any) => (
             <Card
               key={design.id}
               href={`/phonecase/${design.id}`}
@@ -136,7 +139,7 @@ export default function Container({ limit }: ContainerProps) {
     <>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {infiniteData.pages.map((page, i) =>
-          page.data.map((design) => (
+          page.data.map((design: any) => (
             <Card
               key={design.id}
               href={`/phonecase/${design.id}`}

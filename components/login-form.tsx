@@ -67,12 +67,7 @@ export function LoginForm({
       <form onSubmit={handleLogin}>
         <div className="flex flex-col gap-6">
           <div className="flex flex-col items-center gap-2">
-            <Link
-              href="/"
-              className="flex flex-col items-center gap-2 font-medium"
-            >
-              <Logo />
-            </Link>
+            <Logo />
             <h1 className="text-xl font-bold">ورود به ویلون فارسی</h1>
             <div className="text-center text-sm">
               اکانت نداری؟{" "}

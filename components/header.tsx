@@ -44,7 +44,7 @@ function Header() {
       <div
         className={cn(
           `flex z-50 overflow-hidden flex-col sticky top-0 w-full`,
-          isMenuOpen ? "bg-transparent" : "bg-background/70 backdrop-blur-xl"
+          isMenuOpen ? "bg-transparent" : "bg-background/50 backdrop-blur-xl"
         )}
       >
         <div className="flex mx-auto container items-center h-16 w-full justify-between px-4">
@@ -106,7 +106,7 @@ function Header() {
       {isMenuOpen && (
         <div className="fixed inset-0 z-40 md:hidden">
           <div
-            className="absolute inset-0 bg-background/70 backdrop-blur-xl"
+            className="absolute inset-0 bg-background/50 backdrop-blur-xl"
             onClick={() => setIsMenuOpen(false)}
           ></div>
 

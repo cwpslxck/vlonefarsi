@@ -1,4 +1,4 @@
-import { createServerSupabaseClient } from "@/utils/supabase/server";
+import { supabase } from "@/utils/supabase/client";
 
 export const revalidate = 3600; // cache 1 ساعت
 
@@ -7,7 +7,6 @@ export async function GET(
   { params }: { params: { brand: string } }
 ) {
   const brand = params.brand;
-  const supabase = createServerSupabaseClient();
 
   try {
     const { data, error } = await supabase

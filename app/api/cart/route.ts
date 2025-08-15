@@ -1,52 +1,43 @@
-import { createServerSupabaseClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import type { User } from "@supabase/supabase-js";
+import { supabase } from "@/utils/supabase/client";
 
-// Common error responses
-const UNAUTHORIZED_RESPONSE = NextResponse.json(
-  { error: "Unauthorized" },
-  { status: 401 }
-);
-const INTERNAL_ERROR_RESPONSE = NextResponse.json(
-  { error: "Internal server error" },
-  { status: 500 }
-);
+const createErrorResponse = (message: string, status: number) =>
+  NextResponse.json({ error: message }, { status });
 
-// Shared authentication logic
-async function authenticateAndGetSupabase(): Promise<
-  { user: User; supabase: any } | { error: NextResponse }
-> {
+const createSuccessResponse = (data?: any) =>
+  NextResponse.json(data ?? { success: true });
+
+async function getAuthenticatedUser() {
   try {
     const cookieStore = await cookies();
     const authToken = cookieStore.get("auth_token")?.value;
 
     if (!authToken) {
-      return { error: UNAUTHORIZED_RESPONSE };
+      return { error: createErrorResponse("Unauthorized", 401) };
     }
 
-    const supabase = createServerSupabaseClient();
     const {
       data: { user },
       error,
     } = await supabase.auth.getUser(authToken);
 
     if (error || !user) {
-      return { error: UNAUTHORIZED_RESPONSE };
+      return { error: createErrorResponse("Unauthorized", 401) };
     }
 
-    return { user, supabase };
+    return { user };
   } catch (err) {
     console.error("Auth error:", err);
-    return { error: UNAUTHORIZED_RESPONSE };
+    return { error: createErrorResponse("Authentication failed", 401) };
   }
 }
 
 export async function GET() {
-  const authResult = await authenticateAndGetSupabase();
+  const authResult = await getAuthenticatedUser();
   if ("error" in authResult) return authResult.error;
 
-  const { user, supabase } = authResult;
+  const { user } = authResult;
 
   try {
     const { data, error } = await supabase
@@ -55,37 +46,46 @@ export async function GET() {
         `
         id,
         quantity,
-        design:design_id (id, name, image_url),
-        phone_model:phone_model_id (id, brand, model, price)
+        design:design_id(id, name, image_url),
+        phone_model:phone_model_id(id, brand, model, price)
       `
       )
-      .eq("user_id", user.id);
+      .eq("user_id", user.id)
+      .order("updated_at", { ascending: false });
 
     if (error) {
       console.error("Database error:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return createErrorResponse("Failed to fetch cart items", 500);
     }
 
-    return NextResponse.json(data || []);
+    const response = NextResponse.json(data || []);
+    response.headers.set(
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate"
+    );
+    response.headers.set("Pragma", "no-cache");
+    response.headers.set("Expires", "0");
+
+    return response;
   } catch (error) {
-    console.error("GET - Unexpected error:", error);
-    return INTERNAL_ERROR_RESPONSE;
+    console.error("GET error:", error);
+    return createErrorResponse("Internal server error", 500);
   }
 }
 
 export async function POST(req: Request) {
-  const authResult = await authenticateAndGetSupabase();
+  const authResult = await getAuthenticatedUser();
   if ("error" in authResult) return authResult.error;
 
-  const { user, supabase } = authResult;
+  const { user } = authResult;
 
   try {
     const { design_id, phone_model_id, quantity = 1 } = await req.json();
 
-    if (!design_id || !phone_model_id) {
-      return NextResponse.json(
-        { error: "design_id and phone_model_id are required" },
-        { status: 400 }
+    if (!design_id || !phone_model_id || quantity < 1) {
+      return createErrorResponse(
+        "Invalid input: design_id, phone_model_id are required and quantity must be positive",
+        400
       );
     }
 
@@ -94,90 +94,120 @@ export async function POST(req: Request) {
         user_id: user.id,
         design_id,
         phone_model_id,
-        quantity,
+        quantity: Math.floor(quantity),
         updated_at: new Date().toISOString(),
       },
       {
         onConflict: "user_id,design_id,phone_model_id",
+        ignoreDuplicates: false,
       }
     );
 
     if (error) {
       console.error("Database error:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return createErrorResponse("Failed to add item to cart", 500);
     }
 
-    return NextResponse.json({ success: true });
+    return createSuccessResponse();
   } catch (error) {
-    console.error("POST - Unexpected error:", error);
-    return INTERNAL_ERROR_RESPONSE;
+    console.error("POST error:", error);
+
+    if (error instanceof SyntaxError) {
+      return createErrorResponse("Invalid JSON format", 400);
+    }
+
+    return createErrorResponse("Internal server error", 500);
+  }
+}
+
+export async function PATCH(req: Request) {
+  const authResult = await getAuthenticatedUser();
+  if ("error" in authResult) return authResult.error;
+
+  const { user } = authResult;
+
+  try {
+    const { id, quantity } = await req.json();
+
+    if (!id || typeof quantity !== "number" || quantity < 1) {
+      return createErrorResponse(
+        "Invalid input: id is required and quantity must be a positive number",
+        400
+      );
+    }
+
+    const { data, error } = await supabase
+      .from("cart_items")
+      .update({
+        quantity: Math.floor(quantity),
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", id)
+      .eq("user_id", user.id)
+      .select("id")
+      .single();
+
+    if (error) {
+      console.error("Database error:", error);
+      return createErrorResponse(
+        error.code === "PGRST116"
+          ? "Cart item not found"
+          : "Failed to update cart item",
+        error.code === "PGRST116" ? 404 : 500
+      );
+    }
+
+    return createSuccessResponse();
+  } catch (error) {
+    console.error("PATCH error:", error);
+
+    if (error instanceof SyntaxError) {
+      return createErrorResponse("Invalid JSON format", 400);
+    }
+
+    return createErrorResponse("Internal server error", 500);
   }
 }
 
 export async function DELETE(req: Request) {
-  const authResult = await authenticateAndGetSupabase();
+  const authResult = await getAuthenticatedUser();
   if ("error" in authResult) return authResult.error;
 
-  const { user, supabase } = authResult;
+  const { user } = authResult;
 
   try {
     const { id } = await req.json();
 
     if (!id) {
-      return NextResponse.json({ error: "ID is required" }, { status: 400 });
+      return createErrorResponse("Item ID is required", 400);
     }
 
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("cart_items")
       .delete()
       .eq("id", id)
-      .eq("user_id", user.id);
+      .eq("user_id", user.id)
+      .select("id")
+      .single();
 
     if (error) {
       console.error("Database error:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("DELETE - Unexpected error:", error);
-    return INTERNAL_ERROR_RESPONSE;
-  }
-}
-
-export async function PATCH(req: Request) {
-  const authResult = await authenticateAndGetSupabase();
-  if ("error" in authResult) return authResult.error;
-
-  const { user, supabase } = authResult;
-
-  try {
-    const { id, quantity } = await req.json();
-
-    if (!id || quantity === undefined) {
-      return NextResponse.json(
-        { error: "ID and quantity are required" },
-        { status: 400 }
+      return createErrorResponse(
+        error.code === "PGRST116"
+          ? "Cart item not found"
+          : "Failed to delete cart item",
+        error.code === "PGRST116" ? 404 : 500
       );
     }
 
-    const { error } = await supabase
-      .from("cart_items")
-      .update({
-        quantity,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", id)
-      .eq("user_id", user.id);
+    return createSuccessResponse();
+  } catch (error) {
+    console.error("DELETE error:", error);
 
-    if (error) {
-      console.error("Database error:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error instanceof SyntaxError) {
+      return createErrorResponse("Invalid JSON format", 400);
     }
 
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("PATCH - Unexpected error:", error);
-    return INTERNAL_ERROR_RESPONSE;
+    return createErrorResponse("Internal server error", 500);
   }
 }

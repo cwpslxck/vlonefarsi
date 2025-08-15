@@ -98,12 +98,7 @@ export function SignupForm({
       <form onSubmit={handleSignup}>
         <div className="flex flex-col gap-6">
           <div className="flex flex-col items-center gap-2">
-            <Link
-              href="/"
-              className="flex flex-col items-center gap-2 font-medium"
-            >
-              <Logo />
-            </Link>
+            <Logo />
             <h1 className="text-xl font-bold">ثبت‌نام در ویلون فارسی</h1>
             <div className="text-center text-sm">
               از قبل اکانت داری؟{" "}

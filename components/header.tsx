@@ -1,12 +1,13 @@
 "use client";
 import Link from "next/link";
-import { BsInstagram } from "react-icons/bs";
+import { BsBasket, BsInstagram } from "react-icons/bs";
 import { FaUserAlt } from "react-icons/fa";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import Logo from "./logo";
 import { MENU_ITEMS } from "@/constants/menu-item";
+import { ShoppingBagIcon } from "lucide-react";
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -43,7 +44,7 @@ function Header() {
       <div
         className={cn(
           `flex z-50 overflow-hidden flex-col sticky top-0 w-full`,
-          isMenuOpen ? "bg-transparent" : "bg-background/70 backdrop-blur-xl"
+          isMenuOpen ? "bg-transparent" : "bg-background/50 backdrop-blur-xl"
         )}
       >
         <div className="flex mx-auto container items-center h-16 w-full justify-between px-4">
@@ -89,12 +90,8 @@ function Header() {
             </ul>
           </div>
           <div className="inline-flex items-center text-xl gap-3">
-            <Link
-              target="_blank"
-              href={"https://instagram.com/vlonefarsi"}
-              className="p-1 cursor-pointer hoveranim"
-            >
-              <BsInstagram />
+            <Link href={"/buy"} className="p-1 cursor-pointer hoveranim">
+              <ShoppingBagIcon />
             </Link>
             <Link
               href={"/dashboard"}
@@ -109,7 +106,7 @@ function Header() {
       {isMenuOpen && (
         <div className="fixed inset-0 z-40 md:hidden">
           <div
-            className="absolute inset-0 bg-background/70 backdrop-blur-xl"
+            className="absolute inset-0 bg-background/50 backdrop-blur-xl"
             onClick={() => setIsMenuOpen(false)}
           ></div>
 

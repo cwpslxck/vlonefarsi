@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation"; // اضافه شد
 import Link from "next/link";
 import { supabase } from "@/utils/supabase/client";
 
@@ -22,7 +22,10 @@ export function SignupForm({
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("url");
 
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -43,7 +46,7 @@ export function SignupForm({
 
       if (signupError) {
         if (signupError.message.includes("already registered")) {
-          setError("این ایمیل از قبل وجود داره!");
+          setError("این شماره از قبل وجود داره!");
         } else if (signupError.message.includes("Password should be")) {
           setError("پسورد باید حداقل ۶ کاراکتر باشه.");
         }
@@ -53,7 +56,7 @@ export function SignupForm({
 
       if (signupData.session) {
         document.cookie = `auth_token=${signupData.session.access_token}; path=/; SameSite=Lax; Secure`;
-        router.push("/dashboard");
+        router.push(callbackUrl || "/");
         setLoading(false);
         return;
       }
@@ -81,7 +84,7 @@ export function SignupForm({
       }
 
       document.cookie = `auth_token=${signInData.session.access_token}; path=/; SameSite=Lax; Secure`;
-      router.push("/dashboard");
+      router.push(callbackUrl || "/");
     } catch (err) {
       console.error("Signup error:", err);
       setError("خطای غیرمنتظره‌ای رخ داد. لطفاً دوباره تلاش کن.");
@@ -95,23 +98,25 @@ export function SignupForm({
       <form onSubmit={handleSignup}>
         <div className="flex flex-col gap-6">
           <div className="flex flex-col items-center gap-2">
-            <Link
-              href="/"
-              className="flex flex-col items-center gap-2 font-medium"
-            >
-              <Logo />
-            </Link>
+            <Logo />
             <h1 className="text-xl font-bold">ثبت‌نام در ویلون فارسی</h1>
             <div className="text-center text-sm">
               از قبل اکانت داری؟{" "}
-              <Link href="/login" className="underline underline-offset-4">
+              <Link
+                href={`/login${
+                  (callbackUrl && `?url=${encodeURIComponent(callbackUrl)}`) ||
+                  ""
+                }`}
+                className="underline underline-offset-4"
+              >
                 لاگین کن
               </Link>
             </div>
           </div>
           <div className="flex flex-col gap-6">
+            {/* فیلدها مثل قبل */}
             <div className="grid gap-3">
-              <Label htmlFor="email">tel</Label>
+              <Label htmlFor="phone">tel</Label>
               <Input
                 id="phone"
                 type="tel"

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation"; // ✅ اضافه شد
 import Link from "next/link";
 import { supabase } from "@/utils/supabase/client";
 
@@ -21,7 +21,10 @@ export function LoginForm({
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("url");
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -37,7 +40,7 @@ export function LoginForm({
 
       if (error) {
         if (error.message.toLowerCase().includes("invalid login credentials")) {
-          setError("ایمیل یا رمز اشتباهه.");
+          setError("شماره یا رمز اشتباهه.");
         } else if (error.message.toLowerCase().includes("too many requests")) {
           setError("لطفا یکم صبر کن و دوباره تلاش کن.");
         }
@@ -50,10 +53,11 @@ export function LoginForm({
       }
 
       document.cookie = `auth_token=${data.session.access_token}; path=/; SameSite=Lax; Secure`;
-      router.refresh();
+      router.push(callbackUrl || "/");
     } catch (err) {
       console.log("Login error:", err);
       setError("خطای غیرمنتظره‌ای رخ داد. لطفاً دوباره تلاش کن.");
+    } finally {
       setLoading(false);
     }
   };
@@ -63,16 +67,17 @@ export function LoginForm({
       <form onSubmit={handleLogin}>
         <div className="flex flex-col gap-6">
           <div className="flex flex-col items-center gap-2">
-            <Link
-              href="/"
-              className="flex flex-col items-center gap-2 font-medium"
-            >
-              <Logo />
-            </Link>
+            <Logo />
             <h1 className="text-xl font-bold">ورود به ویلون فارسی</h1>
             <div className="text-center text-sm">
               اکانت نداری؟{" "}
-              <Link href="/signup" className="underline underline-offset-4">
+              <Link
+                href={`/signup${
+                  (callbackUrl && `?url=${encodeURIComponent(callbackUrl)}`) ||
+                  ""
+                }`}
+                className="underline underline-offset-4"
+              >
                 ثبت‌نام کن
               </Link>
             </div>

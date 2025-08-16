@@ -94,7 +94,7 @@ function Page() {
                 </h1>
               </div>
             </div>
-            <ActionButtons />
+            <ActionButtons designId={design.id} />
           </div>
         </div>
       </div>

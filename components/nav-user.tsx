@@ -18,7 +18,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -49,7 +49,7 @@ export function NavUser() {
               <div className="flex items-center gap-3 w-full flex-row-reverse">
                 <div className="grid flex-1 text-right">
                   <span className="truncate font-medium">
-                    {user?.user_metadata?.displayName}
+                    {user?.user_metadata?.displayName || "کاربر مهمان"}
                   </span>
                   <span className="truncate text-xs text-muted-foreground">
                     {user?.phone || user?.email}

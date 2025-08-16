@@ -45,7 +45,6 @@ export async function GET() {
       .select(
         `
         id,
-        quantity,
         design:design_id(id, name, image_url),
         phone_model:phone_model_id(id, brand, model, price)
       `
@@ -80,28 +79,21 @@ export async function POST(req: Request) {
   const { user } = authResult;
 
   try {
-    const { design_id, phone_model_id, quantity = 1 } = await req.json();
+    const { design_id, phone_model_id } = await req.json();
 
-    if (!design_id || !phone_model_id || quantity < 1) {
+    if (!design_id || !phone_model_id) {
       return createErrorResponse(
-        "Invalid input: design_id, phone_model_id are required and quantity must be positive",
+        "Invalid input: design_id and phone_model_id are required",
         400
       );
     }
 
-    const { error } = await supabase.from("cart_items").upsert(
-      {
-        user_id: user.id,
-        design_id,
-        phone_model_id,
-        quantity: Math.floor(quantity),
-        updated_at: new Date().toISOString(),
-      },
-      {
-        onConflict: "user_id,design_id,phone_model_id",
-        ignoreDuplicates: false,
-      }
-    );
+    const { error } = await supabase.from("cart_items").insert({
+      user_id: user.id,
+      design_id,
+      phone_model_id,
+      updated_at: new Date().toISOString(),
+    });
 
     if (error) {
       console.error("Database error:", error);
@@ -111,55 +103,6 @@ export async function POST(req: Request) {
     return createSuccessResponse();
   } catch (error) {
     console.error("POST error:", error);
-
-    if (error instanceof SyntaxError) {
-      return createErrorResponse("Invalid JSON format", 400);
-    }
-
-    return createErrorResponse("Internal server error", 500);
-  }
-}
-
-export async function PATCH(req: Request) {
-  const authResult = await getAuthenticatedUser();
-  if ("error" in authResult) return authResult.error;
-
-  const { user } = authResult;
-
-  try {
-    const { id, quantity } = await req.json();
-
-    if (!id || typeof quantity !== "number" || quantity < 1) {
-      return createErrorResponse(
-        "Invalid input: id is required and quantity must be a positive number",
-        400
-      );
-    }
-
-    const { data, error } = await supabase
-      .from("cart_items")
-      .update({
-        quantity: Math.floor(quantity),
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", id)
-      .eq("user_id", user.id)
-      .select("id")
-      .single();
-
-    if (error) {
-      console.error("Database error:", error);
-      return createErrorResponse(
-        error.code === "PGRST116"
-          ? "Cart item not found"
-          : "Failed to update cart item",
-        error.code === "PGRST116" ? 404 : 500
-      );
-    }
-
-    return createSuccessResponse();
-  } catch (error) {
-    console.error("PATCH error:", error);
 
     if (error instanceof SyntaxError) {
       return createErrorResponse("Invalid JSON format", 400);
@@ -182,7 +125,7 @@ export async function DELETE(req: Request) {
       return createErrorResponse("Item ID is required", 400);
     }
 
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("cart_items")
       .delete()
       .eq("id", id)

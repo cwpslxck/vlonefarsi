@@ -23,10 +23,9 @@ export async function GET(request: NextRequest) {
         );
       }
 
-      const { data, error } = await supabase
-        .from("designs")
-        .select("*")
-        .limit(limitNumber)
+      const { data, error } = await supabase.rpc("get_random_designs", {
+        row_limit: limitNumber,
+      });
 
       if (error) {
         return NextResponse.json(
@@ -39,6 +38,7 @@ export async function GET(request: NextRequest) {
         {
           data: data || [],
           type: "limited",
+          isRandom: true,
         },
         {
           headers: {

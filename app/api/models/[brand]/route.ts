@@ -1,27 +1,18 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { supabase } from "@/utils/supabase/client";
 
 export const revalidate = 3600;
-const CACHE_DURATION = 3600;
+const CACHE_CONTROL = `public, s-maxage=3600, stale-while-revalidate=7200`;
 
 export async function GET(
-  request: NextRequest,
+  _req: Request,
   { params }: { params: { brand: string } }
 ) {
-  const brand = params.brand;
-
-  if (!brand || typeof brand !== "string") {
-    return NextResponse.json(
-      { error: "Brand parameter is required" },
-      { status: 400 }
-    );
-  }
-
   try {
     const { data, error } = await supabase
       .from("phone_models")
       .select("id, brand, model, price, available")
-      .eq("brand", brand);
+      .eq("brand", params.brand);
 
     if (error) {
       return NextResponse.json(
@@ -30,14 +21,10 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(data || [], {
-      headers: {
-        "Cache-Control": `public, s-maxage=${CACHE_DURATION}, stale-while-revalidate=${
-          CACHE_DURATION * 2
-        }`,
-      },
+    return NextResponse.json(data ?? [], {
+      headers: { "Cache-Control": CACHE_CONTROL },
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

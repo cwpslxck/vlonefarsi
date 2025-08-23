@@ -1,21 +1,23 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { supabase } from "@/utils/supabase/client";
 
 const INITIAL_PAGE_SIZE = 6;
 const SUBSEQUENT_PAGE_SIZE = 4;
-const CACHE_DURATION = 60 * 60;
+const CACHE_DURATION = 3600;
 
-export const revalidate = CACHE_DURATION;
+export const revalidate = 3600;
+const CACHE_CONTROL = `public, s-maxage=${CACHE_DURATION}, stale-while-revalidate=${
+  CACHE_DURATION * 2
+}`;
 
-export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
-  const limit = searchParams.get("limit");
-  const page = searchParams.get("page");
+export async function GET(req: Request) {
+  const url = new URL(req.url);
+  const limit = url.searchParams.get("limit");
+  const page = url.searchParams.get("page");
 
   try {
     if (limit) {
-      const limitNumber = parseInt(limit);
-
+      const limitNumber = parseInt(limit, 10);
       if (isNaN(limitNumber) || limitNumber <= 0) {
         return NextResponse.json(
           { error: "Invalid limit parameter" },
@@ -35,23 +37,12 @@ export async function GET(request: NextRequest) {
       }
 
       return NextResponse.json(
-        {
-          data: data || [],
-          type: "limited",
-          isRandom: true,
-        },
-        {
-          headers: {
-            "Cache-Control": `public, s-maxage=${CACHE_DURATION}, stale-while-revalidate=${
-              CACHE_DURATION * 2
-            }`,
-          },
-        }
+        { data: data ?? [], type: "limited", isRandom: true },
+        { headers: { "Cache-Control": CACHE_CONTROL } }
       );
     }
 
-    const pageParam = page ? parseInt(page) : 0;
-
+    const pageParam = page ? parseInt(page, 10) : 0;
     if (isNaN(pageParam) || pageParam < 0) {
       return NextResponse.json(
         { error: "Invalid page parameter" },
@@ -76,21 +67,15 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(
       {
-        data: data || [],
+        data: data ?? [],
         nextPage:
           data && data.length === pageSize ? pageParam + pageSize : undefined,
         type: "paginated",
       },
-      {
-        headers: {
-          "Cache-Control": `public, s-maxage=${CACHE_DURATION}, stale-while-revalidate=${
-            CACHE_DURATION * 2
-          }`,
-        },
-      }
+      { headers: { "Cache-Control": CACHE_CONTROL } }
     );
-  } catch (error) {
-    console.error("API Error:", error);
+  } catch (err) {
+    console.error("API Error:", err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

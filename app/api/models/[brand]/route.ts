@@ -2,17 +2,17 @@ import { NextResponse } from "next/server";
 import { supabase } from "@/utils/supabase/client";
 
 export const revalidate = 3600;
-const CACHE_CONTROL = `public, s-maxage=3600, stale-while-revalidate=7200`;
+const CACHE_CONTROL = "public, s-maxage=3600, stale-while-revalidate=7200";
 
 export async function GET(
   _req: Request,
-  { params }: { params: { brand: string } }
+  context: { params: { brand: string } }
 ) {
   try {
     const { data, error } = await supabase
       .from("phone_models")
       .select("id, brand, model, price, available")
-      .eq("brand", params.brand);
+      .eq("brand", context.params.brand);
 
     if (error) {
       return NextResponse.json(

@@ -1,6 +1,6 @@
 import { supabase } from "@/utils/supabase/client";
 
-export const revalidate = 0; // هیچ وقت کش نشه
+export const revalidate = 0;
 
 export async function GET(
   _req: Request,

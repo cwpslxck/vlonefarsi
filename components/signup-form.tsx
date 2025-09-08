@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation"; // اضافه شد
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/utils/supabase/client";
 
@@ -14,9 +14,9 @@ import Logo from "./logo";
 
 export function SignupForm({
   className,
+  callbackUrl,
   ...props
-}: React.ComponentProps<"div">) {
-  const [email, setEmail] = useState("");
+}: React.ComponentProps<"div"> & { callbackUrl?: string }) {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -24,8 +24,6 @@ export function SignupForm({
   const [error, setError] = useState<string | null>(null);
 
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("url");
 
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -35,13 +33,9 @@ export function SignupForm({
     try {
       const { data: signupData, error: signupError } =
         await supabase.auth.signUp({
-          phone: phone,
-          password: password,
-          options: {
-            data: {
-              displayName: name,
-            },
-          },
+          phone,
+          password,
+          options: { data: { displayName: name } },
         });
 
       if (signupError) {
@@ -64,15 +58,10 @@ export function SignupForm({
       await new Promise((resolve) => setTimeout(resolve, 500));
 
       const { data: signInData, error: signInError } =
-        await supabase.auth.signInWithPassword({
-          phone: phone,
-          password: password,
-        });
+        await supabase.auth.signInWithPassword({ phone, password });
 
       if (signInError) {
-        if (signInError.message.includes("Invalid login credentials")) {
-          setError("مشکلی در ثبت‌نام پیش اومد.");
-        }
+        setError("مشکلی در ثبت‌نام پیش اومد.");
         setLoading(false);
         return;
       }
@@ -104,8 +93,7 @@ export function SignupForm({
               از قبل اکانت داری؟{" "}
               <Link
                 href={`/login${
-                  (callbackUrl && `?url=${encodeURIComponent(callbackUrl)}`) ||
-                  ""
+                  callbackUrl ? `?url=${encodeURIComponent(callbackUrl)}` : ""
                 }`}
                 className="underline underline-offset-4"
               >
@@ -114,9 +102,8 @@ export function SignupForm({
             </div>
           </div>
           <div className="flex flex-col gap-6">
-            {/* فیلدها مثل قبل */}
             <div className="grid gap-3">
-              <Label htmlFor="phone">tel</Label>
+              <Label htmlFor="phone">شماره همراه</Label>
               <Input
                 id="phone"
                 type="tel"

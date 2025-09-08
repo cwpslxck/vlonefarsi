@@ -133,7 +133,7 @@ export default function CartPage() {
             میتونی چندتا محصول اضاف کنی برای خودت🥀
           </p>
           <div className="w-full p-12">
-            <Container limit={3} />
+            <Container />
           </div>
         </div>
       ) : (

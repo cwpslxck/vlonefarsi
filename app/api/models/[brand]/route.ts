@@ -1,33 +1,25 @@
-import { NextResponse } from "next/server";
 import { supabase } from "@/utils/supabase/client";
 
-export const revalidate = 3600;
-const CACHE_CONTROL = "public, s-maxage=3600, stale-while-revalidate=7200";
+export const revalidate = 0;
 
 export async function GET(
   _req: Request,
-  context: { params: { brand: string } }
+  context: { params: Promise<{ brand: string }> }
 ) {
-  try {
-    const { data, error } = await supabase
-      .from("phone_models")
-      .select("id, brand, model, price, available")
-      .eq("brand", context.params.brand);
+  const { brand } = await context.params;
 
-    if (error) {
-      return NextResponse.json(
-        { error: "Database error", details: error.message },
-        { status: 500 }
-      );
-    }
+  const { data, error } = await supabase
+    .from("phone_models")
+    .select("id, brand, model, price, available")
+    .eq("brand", brand);
 
-    return NextResponse.json(data ?? [], {
-      headers: { "Cache-Control": CACHE_CONTROL },
-    });
-  } catch {
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+  if (error) {
+    return Response.json({ error: error.message }, { status: 500 });
   }
+
+  return Response.json(data, {
+    headers: {
+      "Cache-Control": "no-store, no-cache, must-revalidate",
+    },
+  });
 }

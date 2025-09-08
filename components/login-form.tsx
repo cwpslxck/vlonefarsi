@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation"; // ✅ اضافه شد
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/utils/supabase/client";
 
@@ -14,17 +14,15 @@ import Logo from "./logo";
 
 export function LoginForm({
   className,
+  callbackUrl,
   ...props
-}: React.ComponentProps<"div">) {
-  // const [email, setEmail] = useState("");
+}: React.ComponentProps<"div"> & { callbackUrl?: string }) {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("url");
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -33,9 +31,8 @@ export function LoginForm({
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        // email: email.trim().toLowerCase(),
-        phone: phone,
-        password: password,
+        phone,
+        password,
       });
 
       if (error) {
@@ -73,8 +70,7 @@ export function LoginForm({
               اکانت نداری؟{" "}
               <Link
                 href={`/signup${
-                  (callbackUrl && `?url=${encodeURIComponent(callbackUrl)}`) ||
-                  ""
+                  callbackUrl ? `?url=${encodeURIComponent(callbackUrl)}` : ""
                 }`}
                 className="underline underline-offset-4"
               >
@@ -84,7 +80,7 @@ export function LoginForm({
           </div>
           <div className="flex flex-col gap-6">
             <div className="grid gap-3">
-              <Label htmlFor="email">tel</Label>
+              <Label htmlFor="phone">شماره همراه</Label>
               <Input
                 id="phone"
                 type="tel"
